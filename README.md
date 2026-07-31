@@ -175,7 +175,11 @@ fail-closed gates — and the test suite includes the mutants that prove each ga
 ## License
 
 [Apache-2.0](LICENSE) © 2026 Giuseppe Contartese — built with the governed cooperation method
-it teaches (*Metodo GC*), by a builder AI and a verifier AI under a human sovereign.
+it teaches (*Metodo GC*).
+
+**The team:** Giuseppe Contartese (sovereign PM) · **Codex** by OpenAI (builder — sole payload
+writer, every freeze his) · **Claude** by Anthropic (adversarial verifier — every gate
+countersigned). Two AI lanes, one human with the keys: exactly the topology this skill teaches.
 
 <p align="center">
   <a href="https://www.star-history.com/#ingcontartese-netizen/omni-builder-godmode&Date">
