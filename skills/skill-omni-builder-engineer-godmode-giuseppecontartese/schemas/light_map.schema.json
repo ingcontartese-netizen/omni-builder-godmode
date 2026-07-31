@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:omni-builder:light-map:1",
+  "title": "Omni-Builder mandatory light web research map",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "status", "map_id", "pipeline_id", "task_id",
+    "session_pair_sha256", "role", "session_id", "lane_root",
+    "material_join_binding", "effect_authority_binding",
+    "network_research_performed", "cross_read_performed", "query_events",
+    "sources", "light_source_ids", "topic_clusters", "priority_source_ids",
+    "gaps", "created_at", "record_digest"
+  ],
+  "properties": {
+    "schema": {"const": "omni-light-map-v1"},
+    "status": {"const": "LIGHT_MAP_FROZEN"},
+    "map_id": {"$ref": "#/$defs/identifier"},
+    "pipeline_id": {"$ref": "#/$defs/identifier"},
+    "task_id": {"$ref": "#/$defs/identifier"},
+    "session_pair_sha256": {"$ref": "#/$defs/sha256"},
+    "role": {"enum": ["BUILDER", "VERIFIER"]},
+    "session_id": {"type": "string", "minLength": 1},
+    "lane_root": {"$ref": "#/$defs/absolute_path"},
+    "material_join_binding": {"$ref": "#/$defs/file_binding"},
+    "effect_authority_binding": {"$ref": "#/$defs/file_binding"},
+    "network_research_performed": {"const": true},
+    "cross_read_performed": {"const": false},
+    "query_events": {
+      "type": "array", "minItems": 1,
+      "items": {"$ref": "#/$defs/query_event"}
+    },
+    "sources": {
+      "type": "array", "minItems": 1,
+      "items": {"$ref": "#/$defs/source"}
+    },
+    "light_source_ids": {"$ref": "#/$defs/nonempty_identifiers"},
+    "topic_clusters": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["cluster_id", "label", "source_ids"],
+        "properties": {
+          "cluster_id": {"$ref": "#/$defs/identifier"},
+          "label": {"type": "string", "minLength": 1},
+          "source_ids": {"$ref": "#/$defs/nonempty_identifiers"}
+        }
+      }
+    },
+    "priority_source_ids": {"$ref": "#/$defs/nonempty_identifiers"},
+    "gaps": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+    "created_at": {"type": "string", "format": "date-time"},
+    "record_digest": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "identifier": {"type": "string", "pattern": "^[A-Z0-9][A-Z0-9._-]{0,127}$"},
+    "nonempty_identifiers": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/identifier"}, "uniqueItems": true},
+    "absolute_path": {
+      "type": "string", "minLength": 3,
+      "anyOf": [
+        {"pattern": "^[A-Za-z]:[\\\\/].+"},
+        {"pattern": "^(?:\\\\\\\\|//)[^\\\\/]+[\\\\/][^\\\\/]+(?:[\\\\/].*)?$"},
+        {"pattern": "^/.*"}
+      ]
+    },
+    "file_binding": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "bytes", "sha256"],
+      "properties": {
+        "path": {"$ref": "#/$defs/absolute_path"},
+        "bytes": {"type": "integer", "minimum": 1},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "query_event": {
+      "type": "object", "additionalProperties": false,
+      "required": ["query_id", "query_text", "executed_at", "tool", "result_capture_binding", "returned_source_ids"],
+      "properties": {
+        "query_id": {"$ref": "#/$defs/identifier"},
+        "query_text": {"type": "string", "minLength": 1},
+        "executed_at": {"type": "string", "format": "date-time"},
+        "tool": {"type": "string", "minLength": 1},
+        "result_capture_binding": {"$ref": "#/$defs/file_binding"},
+        "returned_source_ids": {"$ref": "#/$defs/nonempty_identifiers"}
+      }
+    },
+    "source": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source_id", "research_phase", "locator", "title", "publisher", "accessed_at", "capture_mode", "capture_binding", "sections_consulted"],
+      "properties": {
+        "source_id": {"$ref": "#/$defs/identifier"},
+        "research_phase": {"const": "LIGHT_WEB"},
+        "locator": {"type": "string", "minLength": 1},
+        "title": {"type": "string", "minLength": 1},
+        "publisher": {"type": "string", "minLength": 1},
+        "accessed_at": {"type": "string", "format": "date-time"},
+        "capture_mode": {"const": "CAPTURE_MD_ONLY"},
+        "capture_binding": {"$ref": "#/$defs/file_binding"},
+        "sections_consulted": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}, "uniqueItems": true}
+      }
+    }
+  }
+}

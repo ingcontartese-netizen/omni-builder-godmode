@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:omni-builder:rotation-state:2",
+  "title": "Governed rotation state",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "request_id", "rotation_id", "generation", "nonce", "state", "project_root",
+    "predecessor_session_id", "successor_session_id", "lease_owner", "profile_sha256",
+    "manifest_sha256", "payload_sha256", "channel_baseline", "max_spawn", "recurrence",
+    "scope", "authority_source", "operator_kind", "operator_authorized", "sentinels",
+    "authority_inherited", "external_effects_allowed", "revoked_at", "released_at",
+    "granted_at", "created_at"
+  ],
+  "properties": {
+    "schema": {"const": "omni-rotation-state-v2"},
+    "request_id": {"type": "string", "minLength": 1},
+    "rotation_id": {"type": "string", "minLength": 1},
+    "generation": {"type": "integer", "minimum": 1},
+    "nonce": {"type": "string", "minLength": 1},
+    "state": {
+      "enum": [
+        "ROTATION_REQUESTED", "HANDOFF_FROZEN", "SUCCESSOR_CREATED", "SESSION_BOUND",
+        "ATTACH_PASS", "RESTORE_PASS", "AUTHORITY_ENVELOPE_BOUND", "VISIBLE_SESSION_SELECTED",
+        "PREDECESSOR_FENCE_STARTED", "PREDECESSOR_AUTHORITY_REVOKED", "PREDECESSOR_QUIESCENT",
+        "LEASE_GRANTED", "RESUME_PASS", "WORK_ACKED", "WORK_STARTED_PROBE",
+        "WORK_RESUMED_NOTIFIED", "PEER_COUNTERSIGN", "SUBSTANTIVE_WORK_RELEASED", "ROTATION_ABORTED"
+      ]
+    },
+    "project_root": {"type": "string", "minLength": 1},
+    "predecessor_session_id": {"type": "string", "minLength": 1},
+    "successor_session_id": {"type": ["string", "null"]},
+    "lease_owner": {"enum": ["PREDECESSOR", "SUCCESSOR", "NONE"]},
+    "profile_sha256": {"$ref": "#/$defs/sha256"},
+    "manifest_sha256": {"$ref": "#/$defs/sha256"},
+    "payload_sha256": {"$ref": "#/$defs/sha256"},
+    "channel_baseline": {"type": "integer", "minimum": -1},
+    "max_spawn": {"const": 1},
+    "recurrence": {"const": false},
+    "scope": {"const": "F3_F4_ONLY"},
+    "authority_source": {"type": "string", "minLength": 1},
+    "operator_kind": {"enum": ["NATIVE_HOST_CARRIER", "EXTERNALLY_AUTHORIZED_PER_ACTION"]},
+    "operator_authorized": {"const": true},
+    "sentinels": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["agentic", "script", "context"],
+      "properties": {"agentic": {"type": "boolean"}, "script": {"type": "boolean"}, "context": {"type": "boolean"}}
+    },
+    "authority_inherited": {"const": false},
+    "external_effects_allowed": {"const": false},
+    "revoked_at": {"type": ["string", "null"], "format": "date-time"},
+    "released_at": {"type": ["string", "null"], "format": "date-time"},
+    "granted_at": {"type": ["string", "null"], "format": "date-time"},
+    "created_at": {"type": "string", "format": "date-time"}
+  },
+  "$defs": {"sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"}}
+}

@@ -1,0 +1,36 @@
+schema: omni-host-adapter-v1
+host: openai-codex
+host_version: "Codex App 26.721.4979.0"
+surface_id: codex-desktop-task
+accessed: 2026-07-30
+official_sources: [https://learn.chatgpt.com/docs/build-skills.md, https://developers.openai.com/codex/app-server/, https://developers.openai.com/codex/guides/agents-md/]
+capability_layers:
+  session_carrier:
+    documented: [thread_start, thread_resume, thread_fork, thread_read, thread_list, thread_compact_start, turn_start]
+    observed: [create_thread, send_message_to_thread, wait_threads, navigate_to_thread]
+    authorized: [create_thread, send_message_to_thread, wait_threads, navigate_to_thread]
+    live_proven: [create_thread, send_message_to_thread, wait_threads, navigate_to_thread]
+  host_supervisor:
+    documented: [persistent_objective, recurring_automation, thread_wait]
+    observed: [persistent_objective, recurring_automation, thread_wait]
+    authorized: [persistent_objective, recurring_automation, thread_wait]
+    live_proven: [persistent_objective, recurring_automation, thread_wait]
+  ui_navigation:
+    documented: [navigate_to_thread]
+    observed: [navigate_to_thread]
+    authorized: [navigate_to_thread]
+    live_proven: [navigate_to_thread_with_visual_readback]
+profile:
+  fields: [surface_id, runtime_version_tuple, model, effort_ui_label, effort_runtime_key, effort_mapping_evidence, sandbox, approval_policy, project_root, thread_id, tool_inventory, objective, agentic_sentinel, script_sentinel, context_sentinel]
+  rule: preserve_model_reasoning_and_sentinels_across_every_new_task
+rotation:
+  carrier: native_thread
+  self_spawn: forbidden
+  state_chain: [ROTATION_REQUESTED, HANDOFF_FROZEN, SUCCESSOR_CREATED, SESSION_BOUND, ATTACH_PASS, RESTORE_PASS, AUTHORITY_ENVELOPE_BOUND, VISIBLE_SESSION_SELECTED, PREDECESSOR_FENCE_STARTED, PREDECESSOR_AUTHORITY_REVOKED, PREDECESSOR_QUIESCENT, LEASE_GRANTED, RESUME_PASS, WORK_ACKED, WORK_STARTED_PROBE, WORK_RESUMED_NOTIFIED, PEER_COUNTERSIGN, SUBSTANTIVE_WORK_RELEASED]
+notes:
+  - The delivery target is the user skill directory $HOME/.agents/skills; repository-scoped copies use .agents/skills from CWD through the repository root.
+  - agents/openai.yaml permits model-selected loading for explicit natural-language requests and motivated proposals; loading is not activation and grants no effect authority.
+  - A successful navigation call requires visual or state readback.
+  - A new task may reset model or reasoning effort; bind and restore both.
+  - Preserve the UI effort label and runtime metadata key independently; do not infer a mapping from names alone.
+  - "Observed 2026-07-30: effort_ui_label=Ultra; effort_runtime_key=xhigh; effort_mapping_evidence=UNRESOLVED_MAPPING; values came from distinct UI and runtime telemetry surfaces and are not declared equivalent."

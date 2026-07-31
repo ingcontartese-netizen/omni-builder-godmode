@@ -1,0 +1,7 @@
+{
+  "schema": "omni-incident-fixture-v1",
+  "id": "PB-012-ECHO-UNSATISFIABLE-GOAL",
+  "control": "echo_detector",
+  "input": {"objective_digest": "A", "evidence_digests": ["B", "B", "B"], "objective_satisfiable": false},
+  "expected": {"must_block": true, "reason": "UNSATISFIABLE_OBJECTIVE_OR_ECHO_WITHOUT_PROGRESS"}
+}

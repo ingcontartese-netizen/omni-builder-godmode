@@ -1,0 +1,3 @@
+# Validation baseline: CPython 3.14.3
+PyYAML==6.0.3
+jsonschema==4.26.0

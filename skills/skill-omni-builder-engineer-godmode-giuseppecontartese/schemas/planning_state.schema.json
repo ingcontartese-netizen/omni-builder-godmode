@@ -1,0 +1,248 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:omni-builder:planning-state:1",
+  "title": "Omni-Builder L4 Planning State",
+  "description": "Hash-chained create-once L4 state. PROGRAM_BAPTIZED opens only later operating-regime work and grants no execution authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "state_id", "program_id", "generation", "phase", "status", "task_id",
+    "knowledge_pipeline_id", "planning_root", "knowledge_state_binding",
+    "knowledge_fusion_countersign_binding", "canonical_knowledge_binding",
+    "session_pair_sha256", "session_pair", "topology", "profile", "run_kind", "sovereign_id",
+    "lanes", "fusion", "baptism",
+    "event", "actor", "effect_authority_binding", "operation_nonce_binding",
+    "generation_claim_binding", "evidence_bindings", "blocking_reason_codes",
+    "previous_state_binding", "created_at", "record_digest"
+  ],
+  "properties": {
+    "schema": {"const": "omni-planning-state-v1"},
+    "state_id": {"$ref": "#/$defs/identifier"},
+    "program_id": {"$ref": "#/$defs/identifier"},
+    "generation": {"type": "integer", "minimum": 1},
+    "phase": {
+      "enum": [
+        "PLANNING_INITIALIZED", "PLAN_LANES_COMMITTED", "PLAN_LANES_FREEZING", "PLAN_LANES_FROZEN",
+        "PROGRAM_FUSION_FROZEN", "PROGRAM_COUNTERSIGN_ACCEPTED",
+        "PROGRAM_COUNTERSIGN_BLOCKED", "PROGRAM_COUNTERSIGN_INCONCLUSIVE",
+        "PROGRAM_BAPTIZED"
+      ]
+    },
+    "status": {"enum": ["ACTIVE", "PASS", "BLOCKED", "INCONCLUSIVE"]},
+    "task_id": {"$ref": "#/$defs/identifier"},
+    "knowledge_pipeline_id": {"$ref": "#/$defs/identifier"},
+    "planning_root": {"$ref": "#/$defs/absolute_path"},
+    "knowledge_state_binding": {"$ref": "#/$defs/file_binding"},
+    "knowledge_fusion_countersign_binding": {"$ref": "#/$defs/file_binding"},
+    "canonical_knowledge_binding": {"$ref": "#/$defs/file_binding"},
+    "session_pair_sha256": {"$ref": "#/$defs/sha256"},
+    "session_pair": {"$ref": "#/$defs/session_pair"},
+    "topology": {"enum": ["TEAM_DUAL_LANE", "SOLO_DUAL_HAT"]},
+    "profile": {"const": "GODMODE"},
+    "run_kind": {"enum": ["REAL", "DRY_RUN"]},
+    "sovereign_id": {"type": "string", "minLength": 1, "maxLength": 256},
+    "lanes": {
+      "type": "object", "additionalProperties": false,
+      "required": ["BUILDER", "VERIFIER"],
+      "properties": {
+        "BUILDER": {"allOf": [{"$ref": "#/$defs/lane"}, {"properties": {"role": {"const": "BUILDER"}}}]},
+        "VERIFIER": {"allOf": [{"$ref": "#/$defs/lane"}, {"properties": {"role": {"const": "VERIFIER"}}}]}
+      }
+    },
+    "fusion": {"$ref": "#/$defs/fusion"},
+    "baptism": {"$ref": "#/$defs/baptism"},
+    "event": {"enum": ["INIT", "COMMIT_PLAN_LANES", "FREEZE_PLAN_LANE", "EMIT_PROGRAM_FUSION", "COUNTERSIGN_PROGRAM", "BAPTIZE_PROGRAM"]},
+    "actor": {
+      "type": "object", "additionalProperties": false,
+      "required": ["role", "session_id"],
+      "properties": {
+        "role": {"enum": ["BUILDER", "VERIFIER", "PM"]},
+        "session_id": {"type": "string", "minLength": 1, "maxLength": 256}
+      }
+    },
+    "effect_authority_binding": {"$ref": "#/$defs/file_binding"},
+    "operation_nonce_binding": {"$ref": "#/$defs/file_binding"},
+    "generation_claim_binding": {"$ref": "#/$defs/file_binding"},
+    "evidence_bindings": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/file_binding"}},
+    "blocking_reason_codes": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/identifier"}},
+    "previous_state_binding": {"$ref": "#/$defs/nullable_file_binding"},
+    "created_at": {"type": "string", "format": "date-time"},
+    "record_digest": {"$ref": "#/$defs/sha256"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"phase": {"const": "PLANNING_INITIALIZED"}}, "required": ["phase"]},
+      "then": {
+        "properties": {
+          "lanes": {
+            "properties": {
+              "BUILDER": {"properties": {"state": {"const": "DRAFTING"}, "draft_binding": {"type": "null"}, "manifest_binding": {"type": "null"}, "manifest_commitment": {"type": "null"}}},
+              "VERIFIER": {"properties": {"state": {"const": "DRAFTING"}, "draft_binding": {"type": "null"}, "manifest_binding": {"type": "null"}, "manifest_commitment": {"type": "null"}}}
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"phase": {"const": "PLAN_LANES_COMMITTED"}}, "required": ["phase"]},
+      "then": {
+        "properties": {
+          "lanes": {
+            "properties": {
+              "BUILDER": {"properties": {"state": {"const": "PLAN_LANE_COMMITTED"}, "manifest_binding": {"type": "null"}, "manifest_commitment": {"type": "null"}}},
+              "VERIFIER": {"properties": {"state": {"const": "PLAN_LANE_COMMITTED"}, "manifest_binding": {"type": "null"}, "manifest_commitment": {"type": "null"}}}
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"phase": {"const": "PROGRAM_BAPTIZED"}}, "required": ["phase"]},
+      "then": {
+        "properties": {
+          "status": {"const": "PASS"},
+          "baptism": {"properties": {"state": {"const": "PROGRAM_BAPTIZED"}, "receipt_binding": {"$ref": "#/$defs/file_binding"}}}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"phase": {"const": "PROGRAM_COUNTERSIGN_BLOCKED"}}, "required": ["phase"]},
+      "then": {"properties": {"status": {"const": "BLOCKED"}, "blocking_reason_codes": {"minItems": 1}}}
+    },
+    {
+      "if": {"properties": {"phase": {"const": "PROGRAM_COUNTERSIGN_INCONCLUSIVE"}}, "required": ["phase"]},
+      "then": {"properties": {"status": {"const": "INCONCLUSIVE"}, "blocking_reason_codes": {"minItems": 1}}}
+    },
+    {
+      "if": {"properties": {"phase": {"enum": ["PLAN_LANES_COMMITTED", "PLAN_LANES_FREEZING", "PLAN_LANES_FROZEN", "PROGRAM_FUSION_FROZEN", "PROGRAM_COUNTERSIGN_ACCEPTED", "PROGRAM_COUNTERSIGN_BLOCKED", "PROGRAM_COUNTERSIGN_INCONCLUSIVE", "PROGRAM_BAPTIZED"]}}, "required": ["phase"]},
+      "then": {
+        "properties": {
+          "lanes": {
+            "properties": {
+              "BUILDER": {"properties": {"draft_binding": {"$ref": "#/$defs/file_binding"}}},
+              "VERIFIER": {"properties": {"draft_binding": {"$ref": "#/$defs/file_binding"}}}
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"phase": {"const": "PLAN_LANES_FREEZING"}}, "required": ["phase"]},
+      "then": {
+        "properties": {
+          "lanes": {
+            "anyOf": [
+              {
+                "properties": {
+                  "BUILDER": {"properties": {"state": {"const": "PLAN_LANE_FROZEN_PRIVATE"}}},
+                  "VERIFIER": {"properties": {"state": {"const": "PLAN_LANE_COMMITTED"}}}
+                }
+              },
+              {
+                "properties": {
+                  "BUILDER": {"properties": {"state": {"const": "PLAN_LANE_COMMITTED"}}},
+                  "VERIFIER": {"properties": {"state": {"const": "PLAN_LANE_FROZEN_PRIVATE"}}}
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"phase": {"enum": ["PLAN_LANES_FROZEN", "PROGRAM_FUSION_FROZEN", "PROGRAM_COUNTERSIGN_ACCEPTED", "PROGRAM_COUNTERSIGN_BLOCKED", "PROGRAM_COUNTERSIGN_INCONCLUSIVE", "PROGRAM_BAPTIZED"]}}, "required": ["phase"]},
+      "then": {
+        "properties": {
+          "lanes": {
+            "properties": {
+              "BUILDER": {"properties": {"state": {"const": "PLAN_LANE_FROZEN"}, "manifest_binding": {"$ref": "#/$defs/file_binding"}}},
+              "VERIFIER": {"properties": {"state": {"const": "PLAN_LANE_FROZEN"}, "manifest_binding": {"$ref": "#/$defs/file_binding"}}}
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"phase": {"enum": ["PROGRAM_FUSION_FROZEN", "PROGRAM_COUNTERSIGN_ACCEPTED", "PROGRAM_COUNTERSIGN_BLOCKED", "PROGRAM_COUNTERSIGN_INCONCLUSIVE", "PROGRAM_BAPTIZED"]}}, "required": ["phase"]},
+      "then": {"properties": {"fusion": {"properties": {"candidate_binding": {"$ref": "#/$defs/file_binding"}, "state": {"enum": ["PROGRAM_FUSION_FROZEN", "PROGRAM_COUNTERSIGN_ACCEPTED", "PROGRAM_COUNTERSIGN_BLOCKED", "PROGRAM_COUNTERSIGN_INCONCLUSIVE", "PROGRAM_BAPTIZED"]}}}}}
+    },
+    {
+      "if": {"properties": {"phase": {"enum": ["PROGRAM_COUNTERSIGN_ACCEPTED", "PROGRAM_COUNTERSIGN_BLOCKED", "PROGRAM_COUNTERSIGN_INCONCLUSIVE", "PROGRAM_BAPTIZED"]}}, "required": ["phase"]},
+      "then": {"properties": {"fusion": {"properties": {"countersign_binding": {"$ref": "#/$defs/file_binding"}}}}}
+    }
+  ],
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "identifier": {"type": "string", "pattern": "^[A-Z0-9][A-Z0-9._-]{0,127}$"},
+    "absolute_path": {
+      "type": "string", "minLength": 3,
+      "anyOf": [
+        {"pattern": "^[A-Za-z]:[\\\\/].+"},
+        {"pattern": "^(?:\\\\\\\\|//)[^\\\\/]+[\\\\/][^\\\\/]+(?:[\\\\/].*)?$"},
+        {"pattern": "^/.*"}
+      ]
+    },
+    "file_binding": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "bytes", "sha256"],
+      "properties": {"path": {"$ref": "#/$defs/absolute_path"}, "bytes": {"type": "integer", "minimum": 1}, "sha256": {"$ref": "#/$defs/sha256"}}
+    },
+    "nullable_file_binding": {"oneOf": [{"$ref": "#/$defs/file_binding"}, {"type": "null"}]},
+    "participant": {
+      "type": "object", "additionalProperties": false,
+      "required": ["role", "session_id"],
+      "properties": {"role": {"enum": ["BUILDER", "VERIFIER"]}, "session_id": {"type": "string", "minLength": 1, "maxLength": 256}}
+    },
+    "session_pair": {
+      "type": "object", "additionalProperties": false,
+      "required": ["pair_sha256", "builder", "verifier"],
+      "properties": {
+        "pair_sha256": {"$ref": "#/$defs/sha256"},
+        "builder": {"allOf": [{"$ref": "#/$defs/participant"}, {"properties": {"role": {"const": "BUILDER"}}}]},
+        "verifier": {"allOf": [{"$ref": "#/$defs/participant"}, {"properties": {"role": {"const": "VERIFIER"}}}]}
+      }
+    },
+    "lane": {
+      "type": "object", "additionalProperties": false,
+      "required": ["role", "session_id", "lane_root", "state", "draft_binding", "manifest_binding", "manifest_commitment"],
+      "properties": {
+        "role": {"enum": ["BUILDER", "VERIFIER"]},
+        "session_id": {"type": "string", "minLength": 1, "maxLength": 256},
+        "lane_root": {"$ref": "#/$defs/absolute_path"},
+        "state": {"enum": ["DRAFTING", "PLAN_LANE_COMMITTED", "PLAN_LANE_FROZEN_PRIVATE", "PLAN_LANE_FROZEN"]},
+        "draft_binding": {"$ref": "#/$defs/nullable_file_binding"},
+        "manifest_binding": {"$ref": "#/$defs/nullable_file_binding"},
+        "manifest_commitment": {
+          "oneOf": [
+            {"type": "null"},
+            {
+              "type": "object", "additionalProperties": false,
+              "required": ["bytes", "sha256"],
+              "properties": {
+                "bytes": {"type": "integer", "minimum": 1},
+                "sha256": {"$ref": "#/$defs/sha256"}
+              }
+            }
+          ]
+        }
+      }
+    },
+    "fusion": {
+      "type": "object", "additionalProperties": false,
+      "required": ["state", "candidate_binding", "countersign_binding"],
+      "properties": {
+        "state": {"enum": ["NOT_STARTED", "PROGRAM_FUSION_FROZEN", "PROGRAM_COUNTERSIGN_ACCEPTED", "PROGRAM_COUNTERSIGN_BLOCKED", "PROGRAM_COUNTERSIGN_INCONCLUSIVE", "PROGRAM_BAPTIZED"]},
+        "candidate_binding": {"$ref": "#/$defs/nullable_file_binding"},
+        "countersign_binding": {"$ref": "#/$defs/nullable_file_binding"}
+      }
+    },
+    "baptism": {
+      "type": "object", "additionalProperties": false,
+      "required": ["state", "receipt_binding"],
+      "properties": {
+        "state": {"enum": ["NOT_STARTED", "PROGRAM_BAPTIZED"]},
+        "receipt_binding": {"$ref": "#/$defs/nullable_file_binding"}
+      }
+    }
+  }
+}

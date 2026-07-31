@@ -1,0 +1,33 @@
+schema: omni-host-adapter-v1
+host: cursor
+host_version: UNOBSERVED_NOT_ON_PATH
+surface_id: cursor-cli
+accessed: 2026-07-30
+official_sources: [https://docs.cursor.com/en/cli/overview, https://docs.cursor.com/en/agent/chat/history, https://docs.cursor.com/context/rules-for-ai]
+capability_layers:
+  session_carrier:
+    documented: [cursor_agent_ls, cursor_agent_resume, resume, model, background_mode]
+    observed: []
+    authorized: []
+    live_proven: []
+  host_supervisor:
+    documented: [background_mode]
+    observed: []
+    authorized: []
+    live_proven: []
+  ui_navigation:
+    documented: []
+    observed: []
+    authorized: []
+    live_proven: []
+profile:
+  fields: [surface_id, model, mode, permissions, workspace, chat_id, background_agent_id, tool_inventory, objective, agentic_sentinel, script_sentinel, context_sentinel]
+  rule: ide_and_cli_histories_are_separate_unless_current_vendor_contract_proves_interoperability
+rotation:
+  carrier: DOCUMENTED_NOT_LIVE_PROVEN
+  self_spawn: forbidden
+  state_chain: [ROTATION_REQUESTED, HANDOFF_FROZEN, SUCCESSOR_CREATED, SESSION_BOUND, ATTACH_PASS, RESTORE_PASS, AUTHORITY_ENVELOPE_BOUND, VISIBLE_SESSION_SELECTED, PREDECESSOR_FENCE_STARTED, PREDECESSOR_AUTHORITY_REVOKED, PREDECESSOR_QUIESCENT, LEASE_GRANTED, RESUME_PASS, WORK_ACKED, WORK_STARTED_PROBE, WORK_RESUMED_NOTIFIED, PEER_COUNTERSIGN, SUBSTANTIVE_WORK_RELEASED]
+notes:
+  - Never pass an IDE chat ID to CLI resume without a documented compatibility guarantee; current official documentation does not prove a shared IDE/CLI session store.
+  - Cursor rules and chat history are documented host surfaces, not proof of Agent Skills package parity with Codex, Claude Code, or Antigravity.
+  - Bind model explicitly when a fresh chat can change defaults.

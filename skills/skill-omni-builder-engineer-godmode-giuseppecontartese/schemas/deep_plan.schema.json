@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:omni-builder:deep-plan:1",
+  "title": "Omni-Builder deep web research plan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "status", "plan_id", "pipeline_id", "task_id",
+    "session_pair_sha256", "role", "session_id", "lane_root",
+    "light_map_binding", "light_source_ids", "web_research_required",
+    "cross_read_performed", "research_questions", "planned_queries",
+    "target_source_classes", "novelty_requirement", "download_strategy",
+    "created_at", "record_digest"
+  ],
+  "properties": {
+    "schema": {"const": "omni-deep-plan-v1"},
+    "status": {"const": "DEEP_PLAN_FROZEN"},
+    "plan_id": {"$ref": "#/$defs/identifier"},
+    "pipeline_id": {"$ref": "#/$defs/identifier"},
+    "task_id": {"$ref": "#/$defs/identifier"},
+    "session_pair_sha256": {"$ref": "#/$defs/sha256"},
+    "role": {"enum": ["BUILDER", "VERIFIER"]},
+    "session_id": {"type": "string", "minLength": 1},
+    "lane_root": {"$ref": "#/$defs/absolute_path"},
+    "light_map_binding": {"$ref": "#/$defs/file_binding"},
+    "light_source_ids": {"$ref": "#/$defs/nonempty_identifiers"},
+    "web_research_required": {"const": true},
+    "cross_read_performed": {"const": false},
+    "research_questions": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+    "planned_queries": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+    "target_source_classes": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+    "novelty_requirement": {
+      "type": "object", "additionalProperties": false,
+      "required": ["basis", "require_set_difference", "minimum_new_sources"],
+      "properties": {
+        "basis": {"const": "LIGHT_MAP_SOURCE_IDS"},
+        "require_set_difference": {"const": true},
+        "minimum_new_sources": {"type": "integer", "minimum": 1}
+      }
+    },
+    "download_strategy": {"const": "CAPTURE_MD_ONLY_UNLESS_SEPARATELY_AUTHORIZED"},
+    "created_at": {"type": "string", "format": "date-time"},
+    "record_digest": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "identifier": {"type": "string", "pattern": "^[A-Z0-9][A-Z0-9._-]{0,127}$"},
+    "nonempty_identifiers": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/identifier"}, "uniqueItems": true},
+    "absolute_path": {
+      "type": "string", "minLength": 3,
+      "anyOf": [
+        {"pattern": "^[A-Za-z]:[\\\\/].+"},
+        {"pattern": "^(?:\\\\\\\\|//)[^\\\\/]+[\\\\/][^\\\\/]+(?:[\\\\/].*)?$"},
+        {"pattern": "^/.*"}
+      ]
+    },
+    "file_binding": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "bytes", "sha256"],
+      "properties": {
+        "path": {"$ref": "#/$defs/absolute_path"},
+        "bytes": {"type": "integer", "minimum": 1},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      }
+    }
+  }
+}

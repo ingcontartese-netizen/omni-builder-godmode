@@ -1,0 +1,159 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:omni-builder:operating-regime-binding:1",
+  "title": "Omni-Builder L5 Operating Regime And Guided Turn Binding",
+  "description": "A PM-bound regime selection or one guided PM turn. Selection never authorizes effects; each guided turn is separately channel-bound and one-shot.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema": {},
+    "status": {},
+    "decision": {},
+    "binding_id": {},
+    "task_id": {},
+    "program_id": {},
+    "knowledge_pipeline_id": {},
+    "regime": {},
+    "fused_program_binding": {},
+    "program_countersign_binding": {},
+    "program_record_digest": {},
+    "countersign_record_digest": {},
+    "session_pair_sha256": {},
+    "subject_role": {},
+    "subject_session_id": {},
+    "official_channel_root": {},
+    "pm_channel_record_binding": {},
+    "selection_nonce": {},
+    "effects_authorized": {},
+    "automation_armed": {},
+    "non_grants": {},
+    "created_at": {},
+    "record_digest": {},
+    "turn_authority_id": {},
+    "action_id": {},
+    "idempotency_key": {},
+    "authorized_effects": {},
+    "official_channel_record_binding": {},
+    "expected_previous_state_binding": {},
+    "input_bindings": {},
+    "target_paths": {},
+    "output_paths": {},
+    "operation_nonce": {},
+    "one_shot": {},
+    "automation_authorized": {}
+  },
+  "oneOf": [
+    {"$ref": "#/$defs/regime_binding"},
+    {"$ref": "#/$defs/guided_turn_authority"}
+  ],
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "identifier": {"type": "string", "pattern": "^[A-Z0-9][A-Z0-9._-]{0,127}$"},
+    "absolute_path": {
+      "type": "string", "minLength": 3,
+      "anyOf": [
+        {"pattern": "^[A-Za-z]:[\\\\/].+"},
+        {"pattern": "^(?:\\\\\\\\|//)[^\\\\/]+[\\\\/][^\\\\/]+(?:[\\\\/].*)?$"},
+        {"pattern": "^/.*"}
+      ]
+    },
+    "file_binding": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "bytes", "sha256"],
+      "properties": {
+        "path": {"$ref": "#/$defs/absolute_path"},
+        "bytes": {"type": "integer", "minimum": 1},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "non_grants": {
+      "const": [
+        "AUTONOMY", "ARM_AUTOMATION", "SENTINEL_AUTHORITY", "F5_DELIVERY",
+        "INSTALL", "PUBLISH", "EXTERNAL_EFFECTS"
+      ]
+    },
+    "regime_binding": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "schema", "status", "decision", "binding_id", "task_id", "program_id",
+        "knowledge_pipeline_id", "regime", "fused_program_binding",
+        "program_countersign_binding", "program_record_digest",
+        "countersign_record_digest", "session_pair_sha256", "subject_role",
+        "subject_session_id", "official_channel_root", "pm_channel_record_binding",
+        "selection_nonce", "effects_authorized", "automation_armed", "non_grants",
+        "created_at", "record_digest"
+      ],
+      "properties": {
+        "schema": {"const": "omni-operating-regime-binding-v1"},
+        "status": {"const": "OPERATING_REGIME_BOUND"},
+        "decision": {"const": "BOUND"},
+        "binding_id": {"$ref": "#/$defs/identifier"},
+        "task_id": {"$ref": "#/$defs/identifier"},
+        "program_id": {"$ref": "#/$defs/identifier"},
+        "knowledge_pipeline_id": {"$ref": "#/$defs/identifier"},
+        "regime": {"enum": ["GUIDED_PM", "AUTONOMOUS"]},
+        "fused_program_binding": {"$ref": "#/$defs/file_binding"},
+        "program_countersign_binding": {"$ref": "#/$defs/file_binding"},
+        "program_record_digest": {"$ref": "#/$defs/sha256"},
+        "countersign_record_digest": {"$ref": "#/$defs/sha256"},
+        "session_pair_sha256": {"$ref": "#/$defs/sha256"},
+        "subject_role": {"const": "BUILDER"},
+        "subject_session_id": {"type": "string", "minLength": 1, "maxLength": 256},
+        "official_channel_root": {"$ref": "#/$defs/absolute_path"},
+        "pm_channel_record_binding": {"$ref": "#/$defs/file_binding"},
+        "selection_nonce": {"$ref": "#/$defs/identifier"},
+        "effects_authorized": {"const": false},
+        "automation_armed": {"const": false},
+        "non_grants": {"$ref": "#/$defs/non_grants"},
+        "created_at": {"type": "string", "format": "date-time"},
+        "record_digest": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "guided_turn_authority": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "schema", "status", "decision", "turn_authority_id", "binding_id",
+        "task_id", "program_id", "session_pair_sha256", "subject_role",
+        "subject_session_id", "action_id", "idempotency_key", "authorized_effects",
+        "official_channel_record_binding", "expected_previous_state_binding",
+        "input_bindings", "target_paths", "output_paths", "operation_nonce", "one_shot",
+        "automation_authorized", "non_grants", "created_at", "record_digest"
+      ],
+      "properties": {
+        "schema": {"const": "omni-guided-pm-turn-authority-v1"},
+        "status": {"const": "GUIDED_PM_TURN_AUTHORIZED"},
+        "decision": {"const": "AUTHORIZED"},
+        "turn_authority_id": {"$ref": "#/$defs/identifier"},
+        "binding_id": {"$ref": "#/$defs/identifier"},
+        "task_id": {"$ref": "#/$defs/identifier"},
+        "program_id": {"$ref": "#/$defs/identifier"},
+        "session_pair_sha256": {"$ref": "#/$defs/sha256"},
+        "subject_role": {"const": "BUILDER"},
+        "subject_session_id": {"type": "string", "minLength": 1, "maxLength": 256},
+        "action_id": {"$ref": "#/$defs/identifier"},
+        "idempotency_key": {"$ref": "#/$defs/identifier"},
+        "authorized_effects": {
+          "type": "array", "minItems": 1, "uniqueItems": true,
+          "items": {"enum": ["F3_BUILD", "F4_TEST", "PROJECT_WRITE", "TEST_EXECUTION", "OFFICIAL_CHANNEL_WRITE"]}
+        },
+        "official_channel_record_binding": {"$ref": "#/$defs/file_binding"},
+        "expected_previous_state_binding": {"$ref": "#/$defs/file_binding"},
+        "input_bindings": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/file_binding"}},
+        "target_paths": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/absolute_path"}},
+        "output_paths": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/absolute_path"}},
+        "operation_nonce": {"$ref": "#/$defs/identifier"},
+        "one_shot": {"const": true},
+        "automation_authorized": {"const": false},
+        "non_grants": {
+          "const": [
+            "AUTONOMY", "ARM_AUTOMATION", "SENTINEL_ARMING", "WAKEUP",
+            "RETRY", "SCHEDULE", "BACKGROUND_JOB", "F5_DELIVERY", "INSTALL",
+            "PUBLISH", "EXTERNAL_EFFECTS"
+          ]
+        },
+        "created_at": {"type": "string", "format": "date-time"},
+        "record_digest": {"$ref": "#/$defs/sha256"}
+      }
+    }
+  }
+}

@@ -1,0 +1,315 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:omni-builder:material-join-manifest:1",
+  "title": "Omni-Builder Material Quarantine and Join Manifest",
+  "description": "Two-stage, hash-bound manifest for inert user material. Metadata and raw bytes remain separate bindings; quarantine never executes content, and user material never replaces mandatory independent web research.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "status",
+    "stage",
+    "pipeline_id",
+    "task_id",
+    "session_pair_sha256",
+    "availability",
+    "items",
+    "joined_item_ids",
+    "rejected_item_ids",
+    "previous_manifest_binding",
+    "created_at",
+    "record_digest"
+  ],
+  "properties": {
+    "schema": {
+      "const": "omni-material-join-manifest-v1"
+    },
+    "status": {
+      "enum": [
+        "MATERIAL_QUARANTINED",
+        "MATERIAL_JOINED"
+      ]
+    },
+    "stage": {
+      "enum": [
+        "QUARANTINED",
+        "JOINED"
+      ]
+    },
+    "pipeline_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "task_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "session_pair_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "availability": {
+      "enum": [
+        "NONE_DECLARED",
+        "USER_MATERIAL_PRESENT"
+      ]
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/material_item"
+      }
+    },
+    "joined_item_ids": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/identifier"
+      },
+      "uniqueItems": true
+    },
+    "rejected_item_ids": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/identifier"
+      },
+      "uniqueItems": true
+    },
+    "previous_manifest_binding": {
+      "$ref": "#/$defs/nullable_file_binding"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "record_digest": {
+      "$ref": "#/$defs/sha256"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "availability": {
+            "const": "NONE_DECLARED"
+          }
+        },
+        "required": [
+          "availability"
+        ]
+      },
+      "then": {
+        "properties": {
+          "items": {
+            "maxItems": 0
+          },
+          "joined_item_ids": {
+            "maxItems": 0
+          },
+          "rejected_item_ids": {
+            "maxItems": 0
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "items": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "stage": {
+            "const": "QUARANTINED"
+          }
+        },
+        "required": [
+          "stage"
+        ]
+      },
+      "then": {
+        "properties": {
+          "status": {
+            "const": "MATERIAL_QUARANTINED"
+          },
+          "items": {
+            "items": {
+              "properties": {
+                "admission": {
+                  "const": "PENDING"
+                },
+                "rejection_reasons": {
+                  "maxItems": 0
+                }
+              }
+            }
+          },
+          "joined_item_ids": {
+            "maxItems": 0
+          },
+          "rejected_item_ids": {
+            "maxItems": 0
+          },
+          "previous_manifest_binding": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "stage": {
+            "const": "JOINED"
+          }
+        },
+        "required": [
+          "stage"
+        ]
+      },
+      "then": {
+        "properties": {
+          "status": {
+            "const": "MATERIAL_JOINED"
+          },
+          "items": {
+            "items": {
+              "properties": {
+                "admission": {
+                  "enum": [
+                    "JOINED",
+                    "REJECTED"
+                  ]
+                }
+              }
+            }
+          },
+          "previous_manifest_binding": {
+            "$ref": "#/$defs/file_binding"
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[A-F0-9]{64}$"
+    },
+    "identifier": {
+      "type": "string",
+      "pattern": "^[A-Z0-9][A-Z0-9._-]{0,127}$"
+    },
+    "absolute_path": {
+      "type": "string",
+      "minLength": 3,
+      "anyOf": [
+        {
+          "pattern": "^[A-Za-z]:[\\\\/].+"
+        },
+        {
+          "pattern": "^(?:\\\\\\\\|//)[^\\\\/]+[\\\\/][^\\\\/]+(?:[\\\\/].*)?$"
+        },
+        {
+          "pattern": "^/.*"
+        }
+      ]
+    },
+    "file_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "bytes",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/absolute_path"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "nullable_file_binding": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/file_binding"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "material_item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "item_id",
+        "source_binding",
+        "quarantine_binding",
+        "metadata_binding",
+        "rights_status",
+        "privacy_status",
+        "acl_status",
+        "scan_status",
+        "parse_status",
+        "admission",
+        "rejection_reasons"
+      ],
+      "properties": {
+        "item_id": {
+          "type": "string",
+          "pattern": "^MAT-[0-9]{4}-[A-F0-9]{12}$"
+        },
+        "source_binding": {
+          "$ref": "#/$defs/file_binding"
+        },
+        "quarantine_binding": {
+          "$ref": "#/$defs/file_binding"
+        },
+        "metadata_binding": {
+          "$ref": "#/$defs/file_binding"
+        },
+        "rights_status": {
+          "type": "string",
+          "minLength": 1
+        },
+        "privacy_status": {
+          "type": "string",
+          "minLength": 1
+        },
+        "acl_status": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scan_status": {
+          "type": "string",
+          "minLength": 1
+        },
+        "parse_status": {
+          "type": "string",
+          "minLength": 1
+        },
+        "admission": {
+          "enum": [
+            "PENDING",
+            "JOINED",
+            "REJECTED"
+          ]
+        },
+        "rejection_reasons": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/identifier"
+          },
+          "uniqueItems": true
+        }
+      }
+    }
+  }
+}

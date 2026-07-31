@@ -1,0 +1,7 @@
+{
+  "schema": "omni-incident-fixture-v1",
+  "id": "PB-017-SHARED-TMP-WILDCARD",
+  "control": "safe_paths",
+  "input": {"path": "C:/tmp/shared/*", "exclusive_workspace": false},
+  "expected": {"must_fail": true, "reason": "UNRESOLVED_WILDCARD_IN_SHARED_DIRECTORY"}
+}

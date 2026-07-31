@@ -1,0 +1,170 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:omni-builder:plan-lane-manifest:1",
+  "title": "Omni-Builder Frozen Plan Lane Manifest",
+  "description": "Create-once freeze of one independently authored realization plan. No peer plan may be read before both lane freezes.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "status", "program_id", "task_id", "knowledge_pipeline_id",
+    "knowledge_state_binding", "knowledge_fusion_countersign_binding",
+    "canonical_knowledge_binding", "session_pair_sha256", "role", "session_id",
+    "lane_root", "plan_draft_binding", "peer_lane_read_before_dual_freeze",
+    "work_items", "alternatives", "risks", "dissent", "created_at", "record_digest"
+  ],
+  "properties": {
+    "schema": {"const": "omni-plan-lane-manifest-v1"},
+    "status": {"const": "PLAN_LANE_FROZEN"},
+    "program_id": {"$ref": "#/$defs/identifier"},
+    "task_id": {"$ref": "#/$defs/identifier"},
+    "knowledge_pipeline_id": {"$ref": "#/$defs/identifier"},
+    "knowledge_state_binding": {"$ref": "#/$defs/file_binding"},
+    "knowledge_fusion_countersign_binding": {"$ref": "#/$defs/file_binding"},
+    "canonical_knowledge_binding": {"$ref": "#/$defs/file_binding"},
+    "session_pair_sha256": {"$ref": "#/$defs/sha256"},
+    "role": {"enum": ["BUILDER", "VERIFIER"]},
+    "session_id": {"type": "string", "minLength": 1, "maxLength": 256},
+    "lane_root": {"$ref": "#/$defs/absolute_path"},
+    "plan_draft_binding": {"$ref": "#/$defs/file_binding"},
+    "peer_lane_read_before_dual_freeze": {"const": false},
+    "work_items": {
+      "type": "array", "minItems": 1, "maxItems": 64,
+      "items": {"$ref": "#/$defs/work_item"}
+    },
+    "alternatives": {"type": "array", "items": {"$ref": "#/$defs/alternative"}},
+    "risks": {"type": "array", "items": {"$ref": "#/$defs/risk"}},
+    "dissent": {"type": "array", "items": {"$ref": "#/$defs/dissent"}},
+    "created_at": {"type": "string", "format": "date-time"},
+    "record_digest": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "identifier": {"type": "string", "pattern": "^[A-Z0-9][A-Z0-9._-]{0,127}$"},
+    "absolute_path": {
+      "type": "string", "minLength": 3,
+      "anyOf": [
+        {"pattern": "^[A-Za-z]:[\\\\/].+"},
+        {"pattern": "^(?:\\\\\\\\|//)[^\\\\/]+[\\\\/][^\\\\/]+(?:[\\\\/].*)?$"},
+        {"pattern": "^/.*"}
+      ]
+    },
+    "file_binding": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "bytes", "sha256"],
+      "properties": {
+        "path": {"$ref": "#/$defs/absolute_path"},
+        "bytes": {"type": "integer", "minimum": 1},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "artifact": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "create_policy", "owner_role"],
+      "properties": {
+        "path": {"$ref": "#/$defs/absolute_path"},
+        "create_policy": {"enum": ["CREATE_ONCE", "MUTABLE_OWNED", "SUPERSEDE_CREATE_ONCE"]},
+        "owner_role": {"enum": ["BUILDER", "VERIFIER"]}
+      }
+    },
+    "budget": {
+      "type": "object", "additionalProperties": false,
+      "required": ["max_turns", "max_tool_calls", "max_elapsed_seconds"],
+      "properties": {
+        "max_turns": {"type": "integer", "minimum": 1, "maximum": 10000},
+        "max_tool_calls": {"type": "integer", "minimum": 0, "maximum": 100000},
+        "max_elapsed_seconds": {"type": "integer", "minimum": 1, "maximum": 31536000}
+      }
+    },
+    "acceptance_evidence": {
+      "type": "object", "additionalProperties": false,
+      "required": ["evidence_id", "description", "kind"],
+      "properties": {
+        "evidence_id": {"$ref": "#/$defs/identifier"},
+        "description": {"type": "string", "minLength": 1},
+        "kind": {"enum": ["FILE_BINDING", "RECEIPT", "TEST_REPORT", "CHANNEL_RECORD", "REPRODUCTION_LOG"]}
+      }
+    },
+    "rollback": {
+      "type": "object", "additionalProperties": false,
+      "required": ["strategy", "steps"],
+      "properties": {
+        "strategy": {"enum": ["REVERT_CANDIDATE", "SUPERSEDE_CREATE_ONCE", "SAFE_PARK", "NOT_APPLICABLE"]},
+        "steps": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "work_item": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "work_id", "ordinal", "title", "result", "persistent_artifact", "owner_role",
+        "depends_on", "preconditions", "required_capabilities", "budget",
+        "acceptance_evidence", "verifier_role", "rollback", "failure_states",
+        "next_gate", "scope", "origin_refs"
+      ],
+      "properties": {
+        "work_id": {"$ref": "#/$defs/identifier"},
+        "ordinal": {"type": "integer", "minimum": 1, "maximum": 64},
+        "title": {"type": "string", "minLength": 1},
+        "result": {"type": "string", "minLength": 1},
+        "persistent_artifact": {"$ref": "#/$defs/artifact"},
+        "owner_role": {"enum": ["BUILDER", "VERIFIER"]},
+        "depends_on": {"type": "array", "maxItems": 16, "uniqueItems": true, "items": {"$ref": "#/$defs/identifier"}},
+        "preconditions": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "required_capabilities": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/identifier"}},
+        "budget": {"$ref": "#/$defs/budget"},
+        "acceptance_evidence": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/acceptance_evidence"}},
+        "verifier_role": {"enum": ["BUILDER", "VERIFIER"]},
+        "rollback": {"$ref": "#/$defs/rollback"},
+        "failure_states": {
+          "type": "array", "minItems": 1, "uniqueItems": true,
+          "items": {"enum": ["BLOCKED_PENDING_HUMAN", "BLOCKED_PENDING_INFRA", "INCONCLUSIVE", "ABORTED", "SUPERSEDED"]}
+        },
+        "next_gate": {"$ref": "#/$defs/identifier"},
+        "scope": {
+          "type": "array", "minItems": 1, "uniqueItems": true,
+          "items": {"enum": ["F3_BUILD", "F4_TEST"]}
+        },
+        "origin_refs": {
+          "type": "array", "minItems": 1, "uniqueItems": true,
+          "items": {"$ref": "#/$defs/origin_ref"}
+        }
+      }
+    },
+    "origin_ref": {
+      "type": "object", "additionalProperties": false,
+      "required": ["role", "work_id"],
+      "properties": {
+        "role": {"enum": ["BUILDER", "VERIFIER"]},
+        "work_id": {"$ref": "#/$defs/identifier"}
+      }
+    },
+    "alternative": {
+      "type": "object", "additionalProperties": false,
+      "required": ["alternative_id", "statement", "rationale"],
+      "properties": {
+        "alternative_id": {"$ref": "#/$defs/identifier"},
+        "statement": {"type": "string", "minLength": 1},
+        "rationale": {"type": "string", "minLength": 1}
+      }
+    },
+    "risk": {
+      "type": "object", "additionalProperties": false,
+      "required": ["risk_id", "statement", "mitigation", "severity"],
+      "properties": {
+        "risk_id": {"$ref": "#/$defs/identifier"},
+        "statement": {"type": "string", "minLength": 1},
+        "mitigation": {"type": "string", "minLength": 1},
+        "severity": {"enum": ["P0", "P1", "P2"]}
+      }
+    },
+    "dissent": {
+      "type": "object", "additionalProperties": false,
+      "required": ["dissent_id", "statement", "rationale", "status"],
+      "properties": {
+        "dissent_id": {"$ref": "#/$defs/identifier"},
+        "statement": {"type": "string", "minLength": 1},
+        "rationale": {"type": "string", "minLength": 1},
+        "status": {"enum": ["PRESERVED_NONBLOCKING", "ESCALATED_BLOCKING"]}
+      }
+    }
+  }
+}

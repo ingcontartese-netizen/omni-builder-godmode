@@ -1,0 +1,278 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:omni-builder:module:knowledge-research-dossier:authority:1",
+  "title": "KNOWLEDGE_RESEARCH_DOSSIER single-action authority",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "status",
+    "authority_id",
+    "module_id",
+    "run_id",
+    "topic_sha256",
+    "activation_binding",
+    "action",
+    "one_shot",
+    "issued_at",
+    "expires_at",
+    "record_digest"
+  ],
+  "properties": {
+    "schema": {
+      "const": "omni-module-effect-authority-v1"
+    },
+    "status": {
+      "const": "AUTHORIZED"
+    },
+    "authority_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "module_id": {
+      "const": "KNOWLEDGE_RESEARCH_DOSSIER"
+    },
+    "run_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "topic_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "activation_binding": {
+      "$ref": "#/$defs/file_binding"
+    },
+    "action": {
+      "enum": [
+        "READ_NAMED_SOURCES",
+        "CREATE_FILES",
+        "NETWORK_RESEARCH",
+        "DOWNLOAD"
+      ]
+    },
+    "named_sources": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/file_binding"
+      }
+    },
+    "output_root": {
+      "$ref": "#/$defs/absolute_path"
+    },
+    "output_paths": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/absolute_path"
+      }
+    },
+    "allowed_schemes": {
+      "const": [
+        "https"
+      ]
+    },
+    "query_limit": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 100
+    },
+    "source_limit": {
+      "type": "integer",
+      "minimum": 2,
+      "maximum": 500
+    },
+    "capture_policy": {
+      "const": "CAPTURE_MD_ONLY"
+    },
+    "allowed_locators": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^https://[^\\s]+$"
+      }
+    },
+    "quarantine_root": {
+      "$ref": "#/$defs/absolute_path"
+    },
+    "handling_policy": {
+      "const": "QUARANTINE_HASH_NEVER_EXECUTE"
+    },
+    "one_shot": {
+      "const": true
+    },
+    "issued_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "record_digest": {
+      "$ref": "#/$defs/sha256"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "action": {
+            "const": "READ_NAMED_SOURCES"
+          }
+        },
+        "required": [
+          "action"
+        ]
+      },
+      "then": {
+        "required": [
+          "named_sources"
+        ],
+        "properties": {
+          "output_root": false,
+          "output_paths": false,
+          "allowed_schemes": false,
+          "query_limit": false,
+          "source_limit": false,
+          "capture_policy": false,
+          "allowed_locators": false,
+          "quarantine_root": false,
+          "handling_policy": false
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "action": {
+            "const": "CREATE_FILES"
+          }
+        },
+        "required": [
+          "action"
+        ]
+      },
+      "then": {
+        "required": [
+          "output_root",
+          "output_paths"
+        ],
+        "properties": {
+          "named_sources": false,
+          "allowed_schemes": false,
+          "query_limit": false,
+          "source_limit": false,
+          "capture_policy": false,
+          "allowed_locators": false,
+          "quarantine_root": false,
+          "handling_policy": false
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "action": {
+            "const": "NETWORK_RESEARCH"
+          }
+        },
+        "required": [
+          "action"
+        ]
+      },
+      "then": {
+        "required": [
+          "allowed_schemes",
+          "query_limit",
+          "source_limit",
+          "capture_policy"
+        ],
+        "properties": {
+          "named_sources": false,
+          "output_root": false,
+          "output_paths": false,
+          "allowed_locators": false,
+          "quarantine_root": false,
+          "handling_policy": false
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "action": {
+            "const": "DOWNLOAD"
+          }
+        },
+        "required": [
+          "action"
+        ]
+      },
+      "then": {
+        "required": [
+          "allowed_locators",
+          "quarantine_root",
+          "handling_policy"
+        ],
+        "properties": {
+          "named_sources": false,
+          "output_root": false,
+          "output_paths": false,
+          "allowed_schemes": false,
+          "query_limit": false,
+          "source_limit": false,
+          "capture_policy": false
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "pattern": "^[A-Z0-9][A-Z0-9._-]{0,127}$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[A-F0-9]{64}$"
+    },
+    "absolute_path": {
+      "type": "string",
+      "minLength": 3,
+      "anyOf": [
+        {
+          "pattern": "^[A-Za-z]:[\\\\/].+"
+        },
+        {
+          "pattern": "^(?:\\\\\\\\|//)[^\\\\/]+[\\\\/][^\\\\/]+(?:[\\\\/].*)?$"
+        },
+        {
+          "pattern": "^/.*"
+        }
+      ]
+    },
+    "file_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "bytes",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/absolute_path"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "schema": "omni-incident-fixture-v1",
+  "id": "PB-026-UNTYPED-WATCHER-TAKEOVER",
+  "control": "ownership_handover",
+  "input": {"healthy_old_watcher_stopped": true, "typed_handover_exists": false, "new_owner_readback": false},
+  "expected": {"must_fail": true, "reason": "HANDOVER_REQUIRED_BEFORE_STOP"}
+}

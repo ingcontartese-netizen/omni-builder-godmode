@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:omni-builder:program-countersign-receipt:2",
+  "title": "Omni-Builder Independent Program Countersign Receipt V2",
+  "description": "Distinct-verifier decision over an exact PROGRAM_FUSION_FROZEN candidate. ACCEPTED, BLOCK and INCONCLUSIVE remain distinct outcomes.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "status", "decision", "receipt_id", "program_id", "task_id",
+    "knowledge_pipeline_id", "program_binding", "program_record_digest",
+    "knowledge_state_binding", "knowledge_fusion_countersign_binding",
+    "session_pair_sha256", "program_author_session_id", "signer_role",
+    "signer_session_id", "verifier_report_binding", "reproduction",
+    "finding_codes", "evidence_bindings", "created_at", "record_digest"
+  ],
+  "properties": {
+    "schema": {"const": "omni-program-countersign-receipt-v2"},
+    "status": {"enum": ["PROGRAM_COUNTERSIGN_ACCEPTED", "PROGRAM_COUNTERSIGN_BLOCKED", "PROGRAM_COUNTERSIGN_INCONCLUSIVE"]},
+    "decision": {"enum": ["ACCEPTED", "BLOCK", "INCONCLUSIVE"]},
+    "receipt_id": {"$ref": "#/$defs/identifier"},
+    "program_id": {"$ref": "#/$defs/identifier"},
+    "task_id": {"$ref": "#/$defs/identifier"},
+    "knowledge_pipeline_id": {"$ref": "#/$defs/identifier"},
+    "program_binding": {"$ref": "#/$defs/file_binding"},
+    "program_record_digest": {"$ref": "#/$defs/sha256"},
+    "knowledge_state_binding": {"$ref": "#/$defs/file_binding"},
+    "knowledge_fusion_countersign_binding": {"$ref": "#/$defs/file_binding"},
+    "session_pair_sha256": {"$ref": "#/$defs/sha256"},
+    "program_author_session_id": {"type": "string", "minLength": 1, "maxLength": 256},
+    "signer_role": {"const": "VERIFIER"},
+    "signer_session_id": {"type": "string", "minLength": 1, "maxLength": 256},
+    "verifier_report_binding": {"$ref": "#/$defs/file_binding"},
+    "reproduction": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "schema_valid", "dag_valid", "full_wbs_valid", "origin_coverage_complete",
+        "alternatives_preserved", "dissent_preserved", "no_shared_writer",
+        "no_oracle_before_dual_freeze", "exact_bindings"
+      ],
+      "properties": {
+        "schema_valid": {"type": "boolean"},
+        "dag_valid": {"type": "boolean"},
+        "full_wbs_valid": {"type": "boolean"},
+        "origin_coverage_complete": {"type": "boolean"},
+        "alternatives_preserved": {"type": "boolean"},
+        "dissent_preserved": {"type": "boolean"},
+        "no_shared_writer": {"type": "boolean"},
+        "no_oracle_before_dual_freeze": {"type": "boolean"},
+        "exact_bindings": {"type": "boolean"}
+      }
+    },
+    "finding_codes": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/identifier"}},
+    "evidence_bindings": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/file_binding"}},
+    "created_at": {"type": "string", "format": "date-time"},
+    "record_digest": {"$ref": "#/$defs/sha256"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"decision": {"const": "ACCEPTED"}}, "required": ["decision"]},
+      "then": {
+        "properties": {
+          "status": {"const": "PROGRAM_COUNTERSIGN_ACCEPTED"},
+          "finding_codes": {"const": []},
+          "reproduction": {
+            "properties": {
+              "schema_valid": {"const": true}, "dag_valid": {"const": true},
+              "full_wbs_valid": {"const": true}, "origin_coverage_complete": {"const": true},
+              "alternatives_preserved": {"const": true}, "dissent_preserved": {"const": true},
+              "no_shared_writer": {"const": true}, "no_oracle_before_dual_freeze": {"const": true},
+              "exact_bindings": {"const": true}
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"decision": {"const": "BLOCK"}}, "required": ["decision"]},
+      "then": {"properties": {"status": {"const": "PROGRAM_COUNTERSIGN_BLOCKED"}, "finding_codes": {"minItems": 1}}}
+    },
+    {
+      "if": {"properties": {"decision": {"const": "INCONCLUSIVE"}}, "required": ["decision"]},
+      "then": {"properties": {"status": {"const": "PROGRAM_COUNTERSIGN_INCONCLUSIVE"}, "finding_codes": {"minItems": 1}}}
+    }
+  ],
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "identifier": {"type": "string", "pattern": "^[A-Z0-9][A-Z0-9._-]{0,127}$"},
+    "absolute_path": {
+      "type": "string", "minLength": 3,
+      "anyOf": [
+        {"pattern": "^[A-Za-z]:[\\\\/].+"},
+        {"pattern": "^(?:\\\\\\\\|//)[^\\\\/]+[\\\\/][^\\\\/]+(?:[\\\\/].*)?$"},
+        {"pattern": "^/.*"}
+      ]
+    },
+    "file_binding": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "bytes", "sha256"],
+      "properties": {"path": {"$ref": "#/$defs/absolute_path"}, "bytes": {"type": "integer", "minimum": 1}, "sha256": {"$ref": "#/$defs/sha256"}}
+    }
+  }
+}

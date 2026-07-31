@@ -1,0 +1,13 @@
+{
+  "schema": "omni-ownership-handover-v1",
+  "handover_id": "REPLACE_ME",
+  "old_owner": "REPLACE_ME",
+  "new_owner": "REPLACE_ME_DISTINCT",
+  "generation": 1,
+  "reason": "REPLACE_ME",
+  "old_owner_quiescence_required": true,
+  "old_owner_quiescent": false,
+  "new_owner_readback_verified": false,
+  "profile_sha256": "REPLACE_WITH_64_UPPERCASE_HEX",
+  "created_at": "REPLACE_ME"
+}

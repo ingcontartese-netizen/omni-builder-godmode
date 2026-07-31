@@ -1,0 +1,1665 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:omni-builder:guided-intake-state:1",
+  "title": "Governed guided-intake state",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "state_id",
+    "run_id",
+    "generation",
+    "phase",
+    "status",
+    "activation_binding",
+    "run_kind",
+    "effect_policy",
+    "workspace_access_envelope",
+    "profile",
+    "independence",
+    "topology",
+    "session_pair",
+    "team_card",
+    "station_matrix",
+    "station_matrix_sha256",
+    "question_matrix",
+    "intake_proposal",
+    "relay",
+    "critical_closure",
+    "well",
+    "knowledge",
+    "program",
+    "cutover",
+    "blocking_reason_codes",
+    "previous_record_sha256",
+    "created_at",
+    "record_digest"
+  ],
+  "properties": {
+    "schema": {
+      "const": "omni-guided-intake-state-v1"
+    },
+    "state_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "generation": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "phase": {
+      "enum": [
+        "TOPOLOGY_BOUND",
+        "TEAM_CARD_PENDING",
+        "TEAM_CARD_DUAL_ACK",
+        "QUESTIONS_ACTIVE",
+        "PROPOSAL_READBACK_PENDING",
+        "INTAKE_READY",
+        "INTAKE_BLOCKED"
+      ]
+    },
+    "status": {
+      "enum": [
+        "PENDING",
+        "ACTIVE",
+        "READY",
+        "BLOCKED"
+      ]
+    },
+    "activation_binding": {
+      "$ref": "#/$defs/activation_binding"
+    },
+    "run_kind": {
+      "$ref": "#/$defs/run_kind"
+    },
+    "effect_policy": {
+      "$ref": "#/$defs/effect_policy"
+    },
+    "workspace_access_envelope": {
+      "$ref": "#/$defs/workspace_access_envelope_contract"
+    },
+    "profile": {
+      "enum": [
+        "GODMODE",
+        "PROFILE_DEGRADED"
+      ]
+    },
+    "independence": {
+      "enum": [
+        "PEER_INDEPENDENT",
+        "ADVERSARIAL_SOLO",
+        "NOT_QUALIFIED"
+      ]
+    },
+    "topology": {
+      "enum": [
+        "SOLO_DUAL_HAT",
+        "TEAM_DUAL_LANE"
+      ]
+    },
+    "session_pair": {
+      "$ref": "#/$defs/session_pair"
+    },
+    "team_card": {
+      "$ref": "#/$defs/team_card"
+    },
+    "station_matrix": {
+      "type": "array",
+      "minItems": 19,
+      "maxItems": 19,
+      "items": {
+        "$ref": "#/$defs/station"
+      }
+    },
+    "station_matrix_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "question_matrix": {
+      "$ref": "#/$defs/question_matrix"
+    },
+    "intake_proposal": {
+      "$ref": "#/$defs/intake_proposal"
+    },
+    "relay": {
+      "$ref": "#/$defs/relay"
+    },
+    "critical_closure": {
+      "$ref": "#/$defs/critical_closure"
+    },
+    "well": {
+      "$ref": "#/$defs/well_placeholder"
+    },
+    "knowledge": {
+      "$ref": "#/$defs/knowledge_placeholder"
+    },
+    "program": {
+      "$ref": "#/$defs/program_placeholder"
+    },
+    "cutover": {
+      "$ref": "#/$defs/cutover_placeholder"
+    },
+    "blocking_reason_codes": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/reason_code"
+      }
+    },
+    "previous_record_sha256": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/sha256"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "record_digest": {
+      "$ref": "#/$defs/sha256"
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[A-F0-9]{64}$"
+    },
+    "absolute_path": {
+      "type": "string",
+      "minLength": 3,
+      "description": "Native absolute path. Runtime additionally rejects relative and drive-relative forms, ADS, device namespaces, reserved-device names, and trailing-dot/space aliases.",
+      "anyOf": [
+        {"pattern": "^[A-Za-z]:[\\\\/].+"},
+        {"pattern": "^(?:\\\\\\\\|//)[^\\\\/]+[\\\\/][^\\\\/]+(?:[\\\\/].*)?$"},
+        {"pattern": "^/.*"}
+      ]
+    },
+    "nullable_sha256": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/sha256"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "run_kind": {
+      "enum": [
+        "REAL",
+        "DRY_RUN"
+      ]
+    },
+    "effect_policy": {
+      "enum": [
+        "DOWNSTREAM_GATED_REAL",
+        "SIMULATE_WITHOUT_MATERIALIZATION"
+      ]
+    },
+    "workspace_access_envelope_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "status",
+        "outcome",
+        "envelope_id",
+        "activation_receipt_sha256",
+        "task_id",
+        "task_root",
+        "project_root",
+        "source_roots",
+        "owned_lane_root",
+        "session_pair_sha256",
+        "run_kind",
+        "requested_capabilities",
+        "granted_capabilities",
+        "non_grants",
+        "separate_authorizations_required",
+        "excluded_paths",
+        "probe_receipt_binding",
+        "record_digest"
+      ],
+      "properties": {
+        "schema": {
+          "const": "omni-workspace-access-envelope-v1"
+        },
+        "status": {
+          "enum": [
+            "ACCESS_READY",
+            "AUTONOMY_UNAVAILABLE_NO_ACCESS"
+          ]
+        },
+        "outcome": {
+          "enum": [
+            "ACCESS_GRANTED_NON_DESTRUCTIVE",
+            "ACCESS_PARTIAL",
+            "ACCESS_DENIED",
+            "ACCESS_PLANNED_DRY_RUN"
+          ]
+        },
+        "envelope_id": {
+          "type": "string",
+          "pattern": "^[A-Z0-9][A-Z0-9._-]{0,127}$"
+        },
+        "activation_receipt_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^[A-Z0-9][A-Z0-9._-]{0,127}$"
+        },
+        "task_root": {"$ref": "#/$defs/absolute_path"},
+        "project_root": {"$ref": "#/$defs/absolute_path"},
+        "source_roots": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/absolute_path"}
+        },
+        "owned_lane_root": {"$ref": "#/$defs/absolute_path"},
+        "session_pair_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "run_kind": {
+          "$ref": "#/$defs/run_kind"
+        },
+        "requested_capabilities": {
+          "const": [
+            "READ_NAMED_SOURCES",
+            "CREATE_DIRECTORIES_IN_PROJECT_ROOT",
+            "CREATE_FILES_IN_PROJECT_ROOT",
+            "WRITE_OWNED_LANE_FILES"
+          ]
+        },
+        "granted_capabilities": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "READ_NAMED_SOURCES",
+              "CREATE_DIRECTORIES_IN_PROJECT_ROOT",
+              "CREATE_FILES_IN_PROJECT_ROOT",
+              "WRITE_OWNED_LANE_FILES"
+            ]
+          }
+        },
+        "non_grants": {
+          "const": [
+            "DELETE",
+            "MOVE",
+            "RENAME_OUTSIDE_ROOT",
+            "OVERWRITE_PREEXISTING_USER_FILE",
+            "EXECUTE",
+            "INSTALL",
+            "PUBLISH",
+            "EXTERNAL_EFFECTS"
+          ]
+        },
+        "separate_authorizations_required": {
+          "const": [
+            "NETWORK_RESEARCH",
+            "DOWNLOAD"
+          ]
+        },
+        "excluded_paths": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/absolute_path"}
+        },
+        "probe_receipt_binding": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/file_binding"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "record_digest": {
+          "$ref": "#/$defs/sha256"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "ACCESS_READY"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "outcome": {
+                "const": "ACCESS_GRANTED_NON_DESTRUCTIVE"
+              },
+              "run_kind": {
+                "const": "REAL"
+              },
+              "granted_capabilities": {
+                "const": [
+                  "READ_NAMED_SOURCES",
+                  "CREATE_DIRECTORIES_IN_PROJECT_ROOT",
+                  "CREATE_FILES_IN_PROJECT_ROOT",
+                  "WRITE_OWNED_LANE_FILES"
+                ]
+              },
+              "probe_receipt_binding": {
+                "$ref": "#/$defs/file_binding"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "run_kind": {
+                "const": "DRY_RUN"
+              }
+            },
+            "required": [
+              "run_kind"
+            ]
+          },
+          "then": {
+            "properties": {
+              "status": {
+                "const": "AUTONOMY_UNAVAILABLE_NO_ACCESS"
+              },
+              "outcome": {
+                "const": "ACCESS_PLANNED_DRY_RUN"
+              },
+              "granted_capabilities": {
+                "maxItems": 0
+              },
+              "probe_receipt_binding": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "outcome": {
+                "const": "ACCESS_GRANTED_NON_DESTRUCTIVE"
+              }
+            },
+            "required": [
+              "outcome"
+            ]
+          },
+          "then": {
+            "properties": {
+              "status": {
+                "const": "ACCESS_READY"
+              },
+              "run_kind": {
+                "const": "REAL"
+              },
+              "granted_capabilities": {
+                "const": [
+                  "READ_NAMED_SOURCES",
+                  "CREATE_DIRECTORIES_IN_PROJECT_ROOT",
+                  "CREATE_FILES_IN_PROJECT_ROOT",
+                  "WRITE_OWNED_LANE_FILES"
+                ]
+              },
+              "probe_receipt_binding": {
+                "$ref": "#/$defs/file_binding"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "AUTONOMY_UNAVAILABLE_NO_ACCESS"
+              },
+              "run_kind": {
+                "const": "REAL"
+              }
+            },
+            "required": [
+              "status",
+              "run_kind"
+            ]
+          },
+          "then": {
+            "properties": {
+              "outcome": {
+                "enum": [
+                  "ACCESS_PARTIAL",
+                  "ACCESS_DENIED"
+                ]
+              },
+              "probe_receipt_binding": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "outcome": {
+                "const": "ACCESS_PARTIAL"
+              }
+            },
+            "required": [
+              "outcome"
+            ]
+          },
+          "then": {
+            "properties": {
+              "status": {
+                "const": "AUTONOMY_UNAVAILABLE_NO_ACCESS"
+              },
+              "run_kind": {
+                "const": "REAL"
+              },
+              "granted_capabilities": {
+                "minItems": 1,
+                "maxItems": 3
+              },
+              "probe_receipt_binding": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "outcome": {
+                "const": "ACCESS_DENIED"
+              }
+            },
+            "required": [
+              "outcome"
+            ]
+          },
+          "then": {
+            "properties": {
+              "status": {
+                "const": "AUTONOMY_UNAVAILABLE_NO_ACCESS"
+              },
+              "run_kind": {
+                "const": "REAL"
+              },
+              "granted_capabilities": {
+                "maxItems": 0
+              },
+              "probe_receipt_binding": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "file_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "bytes",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      },
+      "allOf": [
+        {
+          "properties": {
+            "path": {"$ref": "#/$defs/absolute_path"}
+          }
+        }
+      ]
+    },
+    "proposal_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "proposal_id",
+        "path",
+        "bytes",
+        "sha256"
+      ],
+      "properties": {
+        "proposal_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "path": {"$ref": "#/$defs/absolute_path"},
+        "bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "activation_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "bytes",
+        "sha256",
+        "receipt_outcome",
+        "decision_schema",
+        "decision_status",
+        "activation_path",
+        "task_scope",
+        "run_kind",
+        "effect_policy",
+        "knowledge_available",
+        "skill_invoked",
+        "effect_authorized",
+        "activation_level",
+        "modules_used",
+        "authority_grants",
+        "artifact_grants",
+        "requested_effects",
+        "effect_grants",
+        "non_grants",
+        "access_envelope_identity",
+        "activation_grants",
+        "activation_non_grants",
+        "intake_allowed",
+        "mode_selection_allowed",
+        "mode_gate",
+        "next_gate"
+      ],
+      "properties": {
+        "path": {"$ref": "#/$defs/absolute_path"},
+        "bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "receipt_outcome": {
+          "const": "ACCEPTED"
+        },
+        "decision_schema": {
+          "const": "omni-invocation-decision-v2"
+        },
+        "decision_status": {
+          "const": "ACTIVATION_ALLOWED"
+        },
+        "activation_path": {
+          "enum": [
+            "EXPLICIT_USER_OPT_IN",
+            "PROPOSAL_ACCEPTED"
+          ]
+        },
+        "task_scope": {
+          "const": "CURRENT_TASK_ONLY"
+        },
+        "run_kind": {
+          "$ref": "#/$defs/run_kind"
+        },
+        "effect_policy": {
+          "$ref": "#/$defs/effect_policy"
+        },
+        "knowledge_available": {
+          "const": true
+        },
+        "skill_invoked": {
+          "const": true
+        },
+        "effect_authorized": {
+          "const": false
+        },
+        "activation_level": {
+          "const": "OMNI_FULL"
+        },
+        "modules_used": {
+          "const": []
+        },
+        "authority_grants": {
+          "const": [
+            "METHOD_USE",
+            "FULL_ORCHESTRATION"
+          ]
+        },
+        "artifact_grants": {
+          "const": []
+        },
+        "requested_effects": {
+          "const": []
+        },
+        "effect_grants": {
+          "const": []
+        },
+        "non_grants": {
+          "const": [
+            "DELETE",
+            "MOVE",
+            "RENAME_OUTSIDE_ROOT",
+            "OVERWRITE_PREEXISTING_USER_FILE",
+            "EXECUTE",
+            "INSTALL",
+            "PUBLISH",
+            "EXTERNAL_EFFECTS",
+            "CREATE_FILES",
+            "ARM_AUTOMATION"
+          ]
+        },
+        "access_envelope_identity": {
+          "const": "PENDING"
+        },
+        "activation_grants": {
+          "const": [
+            "METHOD_USE"
+          ]
+        },
+        "activation_non_grants": {
+          "const": [
+            "PARTNER_SELECTION",
+            "WEB_ACCESS",
+            "DOWNLOAD",
+            "PROJECT_WRITE",
+            "EXECUTION",
+            "AUTONOMY"
+          ]
+        },
+        "intake_allowed": {
+          "const": true
+        },
+        "mode_selection_allowed": {
+          "const": false
+        },
+        "mode_gate": {
+          "const": "MODE_BEFORE_PROGRAM"
+        },
+        "next_gate": {
+          "const": "GUIDED_INTAKE"
+        }
+      }
+    },
+    "participant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "role",
+        "identity",
+        "host",
+        "session_id",
+        "mandate_path",
+        "mandate_bytes",
+        "mandate_sha256",
+        "write_lane",
+        "owned_paths"
+      ],
+      "properties": {
+        "role": {
+          "enum": [
+            "BUILDER",
+            "VERIFIER"
+          ]
+        },
+        "identity": {
+          "type": "string",
+          "minLength": 1
+        },
+        "host": {
+          "type": "string",
+          "minLength": 1
+        },
+        "session_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mandate_path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mandate_bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "mandate_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "write_lane": {
+          "type": "string",
+          "minLength": 1
+        },
+        "owned_paths": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "allOf": [
+        {
+          "properties": {
+            "mandate_path": {"$ref": "#/$defs/absolute_path"},
+            "write_lane": {"$ref": "#/$defs/absolute_path"},
+            "owned_paths": {
+              "items": {"$ref": "#/$defs/absolute_path"}
+            }
+          }
+        }
+      ]
+    },
+    "session_pair": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pair_id",
+        "pair_sha256",
+        "lock_status",
+        "builder",
+        "verifier"
+      ],
+      "properties": {
+        "pair_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pair_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "lock_status": {
+          "const": "LOCKED_UNTIL_CUTOVER"
+        },
+        "builder": {
+          "$ref": "#/$defs/participant"
+        },
+        "verifier": {
+          "$ref": "#/$defs/participant"
+        }
+      }
+    },
+    "team_ack": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "role",
+        "session_id",
+        "status",
+        "observed_card_sha256",
+        "relay_id",
+        "created_at"
+      ],
+      "properties": {
+        "role": {
+          "enum": [
+            "BUILDER",
+            "VERIFIER"
+          ]
+        },
+        "session_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": [
+            "ACK",
+            "MISSING",
+            "MISMATCH"
+          ]
+        },
+        "observed_card_sha256": {
+          "$ref": "#/$defs/nullable_sha256"
+        },
+        "relay_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^RELAY-[0-9]{3}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "team_card": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "card_id",
+        "card_sha256",
+        "card_relay_id",
+        "status",
+        "session_pair_sha256",
+        "sovereign_identity",
+        "partner_identity",
+        "partner_selection_authorization_relay_id",
+        "partner_selection_authorization_sha256",
+        "turn_order",
+        "prohibitions",
+        "pm_reserved_gates",
+        "transport",
+        "acks"
+      ],
+      "properties": {
+        "card_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "card_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "card_relay_id": {
+          "type": "string",
+          "pattern": "^RELAY-[0-9]{3}$"
+        },
+        "status": {
+          "enum": [
+            "DRAFT",
+            "AWAITING_DUAL_ACK",
+            "TEAM_CARD_DUAL_ACK",
+            "BLOCKED"
+          ]
+        },
+        "session_pair_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "sovereign_identity": {
+          "type": "string",
+          "minLength": 1
+        },
+        "partner_identity": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "partner_selection_authorization_relay_id": {
+          "type": "string",
+          "pattern": "^RELAY-[0-9]{3}$"
+        },
+        "partner_selection_authorization_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "turn_order": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "BUILDER",
+              "VERIFIER"
+            ]
+          }
+        },
+        "prohibitions": {
+          "const": [
+            "NO_CROSS_WRITE",
+            "NO_AUTHOR_AND_SIGN",
+            "NO_IMPLICIT_AUTHORITY",
+            "NO_F5",
+            "NO_INSTALLATION",
+            "NO_PUBLICATION",
+            "NO_EXTERNAL_EFFECTS"
+          ]
+        },
+        "pm_reserved_gates": {
+          "const": [
+            "SCOPE_CHANGE",
+            "AUTHORITY_EXPANSION",
+            "KNOWLEDGE_FUSION",
+            "PROGRAM_BAPTISM",
+            "OPERATING_REGIME_BINDING",
+            "EXTERNAL_EFFECTS",
+            "INSTALLATION",
+            "PUBLICATION"
+          ]
+        },
+        "transport": {
+          "const": "PM_RELAY"
+        },
+        "acks": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "builder",
+            "verifier"
+          ],
+          "properties": {
+            "builder": {
+              "$ref": "#/$defs/team_ack"
+            },
+            "verifier": {
+              "$ref": "#/$defs/team_ack"
+            }
+          }
+        }
+      }
+    },
+    "classification": {
+      "enum": [
+        "KNOWN",
+        "ASSUMED",
+        "UNKNOWN",
+        "DECISION_REQUIRED",
+        "EVIDENCE_REQUIRED"
+      ]
+    },
+    "station_id": {
+      "enum": [
+        "Q0_TOPOLOGY",
+        "PARTNER_IDENTITY",
+        "ROLE_BINDING",
+        "FILE_OWNERSHIP",
+        "TURN_ORDER",
+        "PROHIBITIONS",
+        "PM_RESERVED_GATES",
+        "PROJECT_DESCRIPTION",
+        "OBJECTIVE",
+        "NON_OBJECTIVES",
+        "SUCCESS_EVIDENCE",
+        "BUDGETS",
+        "DATA_SENSITIVITY",
+        "REVERSIBILITY",
+        "FORBIDDEN_EFFECTS",
+        "ACCESS_GRANT",
+        "USER_MATERIAL",
+        "RESEARCH_LANES",
+        "COMMUNICATION_REGIME"
+      ]
+    },
+    "station": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "station_id",
+        "classification",
+        "critical",
+        "source_refs",
+        "question_ids"
+      ],
+      "properties": {
+        "station_id": {
+          "$ref": "#/$defs/station_id"
+        },
+        "classification": {
+          "$ref": "#/$defs/classification"
+        },
+        "critical": {
+          "type": "boolean"
+        },
+        "source_refs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/file_binding"
+          }
+        },
+        "question_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^Q-[0-9]{3}$"
+          }
+        }
+      }
+    },
+    "answer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "text",
+        "relay_id",
+        "classification_after",
+        "answer_sha256"
+      ],
+      "properties": {
+        "source": {
+          "enum": [
+            "PM",
+            "BUILDER",
+            "VERIFIER",
+            "GOVERNED_ARTIFACT"
+          ]
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "relay_id": {
+          "type": "string",
+          "pattern": "^RELAY-[0-9]{3}$"
+        },
+        "classification_after": {
+          "$ref": "#/$defs/classification"
+        },
+        "answer_sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "readback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "role",
+        "session_id",
+        "question_status",
+        "observed_question_sha256",
+        "answer_status",
+        "observed_answer_sha256",
+        "question_relay_id",
+        "answer_relay_id",
+        "created_at"
+      ],
+      "properties": {
+        "role": {
+          "enum": [
+            "BUILDER",
+            "VERIFIER"
+          ]
+        },
+        "session_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "question_status": {
+          "enum": [
+            "ACK",
+            "MISSING",
+            "MISMATCH"
+          ]
+        },
+        "observed_question_sha256": {
+          "$ref": "#/$defs/nullable_sha256"
+        },
+        "answer_status": {
+          "enum": [
+            "ACK",
+            "MISSING",
+            "MISMATCH",
+            "NOT_YET_AVAILABLE"
+          ]
+        },
+        "observed_answer_sha256": {
+          "$ref": "#/$defs/nullable_sha256"
+        },
+        "question_relay_id": {
+          "type": "string",
+          "pattern": "^RELAY-[0-9]{3}$"
+        },
+        "answer_relay_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^RELAY-[0-9]{3}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "question": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "question_id",
+        "ordinal",
+        "station_id",
+        "classification_before",
+        "critical",
+        "text",
+        "question_sha256",
+        "relay_id",
+        "answer",
+        "readbacks"
+      ],
+      "properties": {
+        "question_id": {
+          "type": "string",
+          "pattern": "^Q-[0-9]{3}$"
+        },
+        "ordinal": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "station_id": {
+          "$ref": "#/$defs/station_id"
+        },
+        "classification_before": {
+          "$ref": "#/$defs/classification"
+        },
+        "critical": {
+          "type": "boolean"
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "question_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "relay_id": {
+          "type": "string",
+          "pattern": "^RELAY-[0-9]{3}$"
+        },
+        "answer": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/answer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "readbacks": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "builder",
+            "verifier"
+          ],
+          "properties": {
+            "builder": {
+              "$ref": "#/$defs/readback"
+            },
+            "verifier": {
+              "$ref": "#/$defs/readback"
+            }
+          }
+        }
+      }
+    },
+    "question_matrix": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "matrix_sha256",
+        "questions"
+      ],
+      "properties": {
+        "matrix_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "questions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/question"
+          }
+        }
+      }
+    },
+    "proposal_ack": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "role",
+        "session_id",
+        "status",
+        "observed_proposal_sha256",
+        "relay_id",
+        "created_at"
+      ],
+      "properties": {
+        "role": {
+          "enum": [
+            "BUILDER",
+            "VERIFIER"
+          ]
+        },
+        "session_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": [
+            "ACK",
+            "MISSING",
+            "MISMATCH",
+            "NOT_YET_AVAILABLE"
+          ]
+        },
+        "observed_proposal_sha256": {
+          "$ref": "#/$defs/nullable_sha256"
+        },
+        "relay_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^RELAY-[0-9]{3}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "intake_proposal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "session_pair_sha256",
+        "proposal",
+        "acks"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "NOT_EMITTED",
+            "AWAITING_DUAL_READBACK",
+            "DUAL_READBACK_ACKED"
+          ]
+        },
+        "session_pair_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "proposal": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/proposal_binding"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "acks": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "builder",
+            "verifier"
+          ],
+          "properties": {
+            "builder": {
+              "$ref": "#/$defs/proposal_ack"
+            },
+            "verifier": {
+              "$ref": "#/$defs/proposal_ack"
+            }
+          }
+        }
+      }
+    },
+    "relay_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "relay_id",
+        "ordinal",
+        "kind",
+        "origin",
+        "destinations",
+        "phase",
+        "payload_path",
+        "payload_bytes",
+        "payload_sha256",
+        "created_at"
+      ],
+      "properties": {
+        "relay_id": {
+          "type": "string",
+          "pattern": "^RELAY-[0-9]{3}$"
+        },
+        "ordinal": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "kind": {
+          "enum": [
+            "QUESTION",
+            "ANSWER",
+            "READBACK",
+            "TEAM_CARD",
+            "PARTNER_SELECTION_AUTHORIZATION",
+            "INTAKE_PROPOSAL"
+          ]
+        },
+        "origin": {
+          "enum": [
+            "PM",
+            "BUILDER",
+            "VERIFIER"
+          ]
+        },
+        "destinations": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "PM",
+              "BUILDER",
+              "VERIFIER"
+            ]
+          }
+        },
+        "phase": {
+          "type": "string",
+          "minLength": 1
+        },
+        "payload_path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "payload_bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "payload_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "allOf": [
+        {
+          "properties": {
+            "payload_path": {"$ref": "#/$defs/absolute_path"}
+          }
+        }
+      ]
+    },
+    "relay": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "transport",
+        "state",
+        "session_pair_sha256",
+        "same_pair_required",
+        "governed_channel_equivalent",
+        "pm_write_lane",
+        "records"
+      ],
+      "properties": {
+        "transport": {
+          "const": "PM_RELAY"
+        },
+        "state": {
+          "enum": [
+            "ACTIVE",
+            "CUTOVER_PENDING"
+          ]
+        },
+        "session_pair_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "same_pair_required": {
+          "const": true
+        },
+        "governed_channel_equivalent": {
+          "const": false
+        },
+        "pm_write_lane": {
+          "type": "string",
+          "minLength": 1
+        },
+        "records": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/relay_record"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "properties": {
+            "pm_write_lane": {"$ref": "#/$defs/absolute_path"}
+          }
+        }
+      ]
+    },
+    "critical_closure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "derivation",
+        "station_matrix_sha256",
+        "question_matrix_sha256",
+        "status",
+        "open_question_ids",
+        "computed_at"
+      ],
+      "properties": {
+        "derivation": {
+          "const": "RECOMPUTED_FROM_EVIDENCE_AND_FOUR_READBACK_V2"
+        },
+        "station_matrix_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "question_matrix_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "status": {
+          "enum": [
+            "OPEN",
+            "CLOSED"
+          ]
+        },
+        "open_question_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^Q-[0-9]{3}$"
+          }
+        },
+        "computed_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "well_placeholder": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "artifact_sha256"
+      ],
+      "properties": {
+        "state": {
+          "enum": [
+            "WELL_WRITE_SCOPE_PENDING",
+            "WELL_ACTIVE"
+          ]
+        },
+        "artifact_sha256": {
+          "$ref": "#/$defs/nullable_sha256"
+        }
+      }
+    },
+    "knowledge_placeholder": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "fusion_sha256"
+      ],
+      "properties": {
+        "state": {
+          "enum": [
+            "NOT_STARTED",
+            "LANES_ACTIVE",
+            "FUSED"
+          ]
+        },
+        "fusion_sha256": {
+          "$ref": "#/$defs/nullable_sha256"
+        }
+      }
+    },
+    "program_placeholder": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "program_sha256"
+      ],
+      "properties": {
+        "state": {
+          "enum": [
+            "NOT_STARTED",
+            "DRAFTED",
+            "FROZEN"
+          ]
+        },
+        "program_sha256": {
+          "$ref": "#/$defs/nullable_sha256"
+        }
+      }
+    },
+    "cutover_placeholder": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "receipt_sha256"
+      ],
+      "properties": {
+        "state": {
+          "enum": [
+            "NOT_STARTED",
+            "AUTHORIZED",
+            "COMPLETE"
+          ]
+        },
+        "receipt_sha256": {
+          "$ref": "#/$defs/nullable_sha256"
+        }
+      }
+    },
+    "reason_code": {
+      "enum": [
+        "ACTIVATION_RECEIPT_MISSING",
+        "ACTIVATION_RECEIPT_MISMATCH",
+        "ACTIVATION_NOT_ALLOWED",
+        "ACTIVATION_PATH_MISMATCH",
+        "ACTIVATION_LEVEL_INSUFFICIENT",
+        "RUN_KIND_BINDING_MISMATCH",
+        "DRY_RUN_EFFECT_ATTEMPTED",
+        "WORKSPACE_ACCESS_ENVELOPE_MISMATCH",
+        "WORKSPACE_ACCESS_SCOPE_REPLAY",
+        "WORKSPACE_ACCESS_INSUFFICIENT_GRANTS",
+        "WORKSPACE_ACCESS_DESTRUCTIVE_GRANT",
+        "DRY_RUN_ACCESS_PASS_FORBIDDEN",
+        "WORKSPACE_ACCESS_ROOT_MISSING",
+        "WORKSPACE_ACCESS_ROOT_NOT_DIRECTORY",
+        "WORKSPACE_ACCESS_PATH_OUTSIDE_ALLOWLIST",
+        "WORKSPACE_ACCESS_PROBE_MISSING",
+        "WORKSPACE_ACCESS_PROBE_NOT_REGULAR_FILE",
+        "WORKSPACE_ACCESS_PROBE_SIZE_MISMATCH",
+        "WORKSPACE_ACCESS_PROBE_HASH_MISMATCH",
+        "WORKSPACE_ACCESS_PROBE_CONTENT_MISMATCH",
+        "AUTONOMY_UNAVAILABLE_NO_ACCESS",
+        "PARTNER_IDENTITY_REQUIRED",
+        "PARTNER_SELECTION_AUTHORITY_MISSING",
+        "SESSION_PAIR_NOT_DISTINCT",
+        "IDENTITY_NOT_DISTINCT",
+        "SESSION_PAIR_DRIFT",
+        "PROFILE_DEGRADED_NOT_GODMODE",
+        "INDEPENDENCE_PROFILE_MISMATCH",
+        "TEAM_CARD_INCOMPLETE",
+        "TEAM_CARD_DUAL_ACK_MISSING",
+        "TEAM_CARD_DIGEST_MISMATCH",
+        "TEAM_CARD_REQUIRED_BEFORE_INTAKE",
+        "QUESTION_ID_DUPLICATE",
+        "QUESTION_ORDINAL_INVALID",
+        "QUESTION_NOT_MIRRORED",
+        "QUESTION_DIGEST_MISMATCH",
+        "ANSWER_NOT_MIRRORED",
+        "ANSWER_DIGEST_MISMATCH",
+        "CRITICAL_STATION_WITHOUT_QUESTION",
+        "CRITICAL_STATION_EVIDENCE_MISSING",
+        "CRITICAL_EVIDENCE_MISSING",
+        "CRITICAL_EVIDENCE_NOT_REGULAR_FILE",
+        "CRITICAL_EVIDENCE_SIZE_MISMATCH",
+        "CRITICAL_EVIDENCE_HASH_MISMATCH",
+        "CRITICAL_EVIDENCE_PATH_DUPLICATE",
+        "CRITICAL_QUESTION_OPEN",
+        "CRITICAL_CLOSURE_MISMATCH",
+        "STATION_MATRIX_DIGEST_MISMATCH",
+        "FOUR_READBACK_CONTENT_MISMATCH",
+        "RELAY_ID_DUPLICATE",
+        "RELAY_SEQUENCE_INVALID",
+        "RELAY_STATE_INVALID",
+        "RELAY_PAYLOAD_MISMATCH",
+        "RELAY_PAYLOAD_MISSING",
+        "RELAY_PAYLOAD_NOT_REGULAR_FILE",
+        "RELAY_PAYLOAD_SIZE_MISMATCH",
+        "RELAY_PAYLOAD_HASH_MISMATCH",
+        "RELAY_PAYLOAD_PATH_DUPLICATE",
+        "RELAY_PAYLOAD_OUTSIDE_OWNER_LANE",
+        "MANDATE_ARTIFACT_MISSING",
+        "MANDATE_ARTIFACT_NOT_REGULAR_FILE",
+        "MANDATE_ARTIFACT_SIZE_MISMATCH",
+        "MANDATE_ARTIFACT_HASH_MISMATCH",
+        "MANDATE_CONTENT_MISMATCH",
+        "MANDATE_PATH_DUPLICATE",
+        "MANDATE_OUTSIDE_OWNER_LANE",
+        "PM_RELAY_MISLABELED_AS_GOVERNED_CHANNEL",
+        "SESSION_PAIR_CHANGED_BEFORE_CUTOVER",
+        "INTAKE_PROPOSAL_DUAL_READBACK_MISSING",
+        "PREMATURE_L3_L5_STATE"
+      ]
+    }
+  }
+}

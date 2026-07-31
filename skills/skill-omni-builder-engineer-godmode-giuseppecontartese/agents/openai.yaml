@@ -1,0 +1,6 @@
+interface:
+  display_name: "Skill Omni-Builder Engineer – GodMode Protocol – Giuseppe Contartese"
+  short_description: "Passive Omni advice; opt-in modules or full governed building"
+  default_prompt: "Load $skill-omni-builder-engineer-godmode-giuseppecontartese for an explicit natural-language Omni, GodMode, or named-module request, or to make a motivated proposal. Loading grants nothing: Station 0 still requires current-task consent and every effect keeps its own gate. Complexity controls recommendations, not eligibility; explicit GodMode remains admissible for lite work. A named packaged-module request is already module consent: bind exactly one module per MODULE_ACTIVATION_ALLOWED receipt, run only its mini-contract, and stop; changing it requires a new receipt. Enter Q0 only after OMNI_FULL consent. Require canonical absolute physical paths; NUL_FAMILY_NOT_MODULE_SURFACE."
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:omni-builder:planning-effect-authority:1",
+  "title": "Omni-Builder L4 Planning Effect Authority",
+  "description": "Create-once authority for exactly one L4 planning transition. It grants neither project execution nor an operating regime.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "status", "decision", "authority_id", "action", "task_id",
+    "program_id", "knowledge_pipeline_id", "knowledge_state_binding",
+    "knowledge_fusion_countersign_binding", "session_pair_sha256",
+    "subject_role", "subject_session_id", "planning_root",
+    "expected_previous_state_binding", "input_bindings", "output_paths",
+    "one_shot", "operation_nonce", "non_grants", "created_at", "record_digest"
+  ],
+  "properties": {
+    "schema": {"const": "omni-planning-effect-authority-v1"},
+    "status": {"const": "PLANNING_ACTION_AUTHORIZED"},
+    "decision": {"const": "AUTHORIZED"},
+    "authority_id": {"$ref": "#/$defs/identifier"},
+    "action": {
+      "enum": [
+        "INIT_PLANNING", "COMMIT_PLAN_LANES", "FREEZE_PLAN_LANE", "FUSE_PROGRAM",
+        "COUNTERSIGN_PROGRAM", "BAPTIZE_PROGRAM"
+      ]
+    },
+    "task_id": {"$ref": "#/$defs/identifier"},
+    "program_id": {"$ref": "#/$defs/identifier"},
+    "knowledge_pipeline_id": {"$ref": "#/$defs/identifier"},
+    "knowledge_state_binding": {"$ref": "#/$defs/file_binding"},
+    "knowledge_fusion_countersign_binding": {"$ref": "#/$defs/file_binding"},
+    "session_pair_sha256": {"$ref": "#/$defs/sha256"},
+    "subject_role": {"enum": ["BUILDER", "VERIFIER", "PM"]},
+    "subject_session_id": {"type": "string", "minLength": 1, "maxLength": 256},
+    "planning_root": {"$ref": "#/$defs/absolute_path"},
+    "expected_previous_state_binding": {"$ref": "#/$defs/nullable_file_binding"},
+    "input_bindings": {
+      "type": "array", "minItems": 1, "uniqueItems": true,
+      "items": {"$ref": "#/$defs/file_binding"}
+    },
+    "output_paths": {
+      "type": "array", "minItems": 3, "uniqueItems": true,
+      "items": {"$ref": "#/$defs/absolute_path"}
+    },
+    "one_shot": {"const": true},
+    "operation_nonce": {"$ref": "#/$defs/identifier"},
+    "non_grants": {
+      "const": [
+        "DELETE", "MOVE", "RENAME_OUTSIDE_ROOT", "OVERWRITE_PREEXISTING_USER_FILE",
+        "PROJECT_EXECUTION", "AUTONOMY", "ARM_AUTOMATION", "INSTALL", "PUBLISH",
+        "EXTERNAL_EFFECTS"
+      ]
+    },
+    "created_at": {"type": "string", "format": "date-time"},
+    "record_digest": {"$ref": "#/$defs/sha256"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"action": {"enum": ["INIT_PLANNING", "COMMIT_PLAN_LANES", "FUSE_PROGRAM"]}}, "required": ["action"]},
+      "then": {"properties": {"subject_role": {"const": "BUILDER"}}}
+    },
+    {
+      "if": {"properties": {"action": {"const": "COUNTERSIGN_PROGRAM"}}, "required": ["action"]},
+      "then": {"properties": {"subject_role": {"const": "VERIFIER"}}}
+    },
+    {
+      "if": {"properties": {"action": {"const": "BAPTIZE_PROGRAM"}}, "required": ["action"]},
+      "then": {"properties": {"subject_role": {"const": "PM"}}}
+    },
+    {
+      "if": {"properties": {"action": {"const": "INIT_PLANNING"}}, "required": ["action"]},
+      "then": {"properties": {"expected_previous_state_binding": {"type": "null"}}},
+      "else": {"properties": {"expected_previous_state_binding": {"$ref": "#/$defs/file_binding"}}}
+    }
+  ],
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "identifier": {"type": "string", "pattern": "^[A-Z0-9][A-Z0-9._-]{0,127}$"},
+    "absolute_path": {
+      "type": "string", "minLength": 3,
+      "anyOf": [
+        {"pattern": "^[A-Za-z]:[\\\\/].+"},
+        {"pattern": "^(?:\\\\\\\\|//)[^\\\\/]+[\\\\/][^\\\\/]+(?:[\\\\/].*)?$"},
+        {"pattern": "^/.*"}
+      ]
+    },
+    "file_binding": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "bytes", "sha256"],
+      "properties": {
+        "path": {"$ref": "#/$defs/absolute_path"},
+        "bytes": {"type": "integer", "minimum": 1},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "nullable_file_binding": {"oneOf": [{"$ref": "#/$defs/file_binding"}, {"type": "null"}]}
+  }
+}

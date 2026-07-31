@@ -1,0 +1,7 @@
+{
+  "schema": "omni-incident-fixture-v1",
+  "id": "PB-CANDIDATE-UNINCISED-LESSON",
+  "control": "enumerated_claim",
+  "input": {"claimed_count": 22, "enumerated_ids": ["L01", "L02", "L03"]},
+  "expected": {"must_fail": true, "reason": "CLAIM_COUNT_NOT_ENUMERATED"}
+}

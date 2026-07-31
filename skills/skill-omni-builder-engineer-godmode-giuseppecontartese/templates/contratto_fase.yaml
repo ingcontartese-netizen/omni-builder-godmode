@@ -1,0 +1,431 @@
+schema: omni-phase-contract-v1
+template_scope:
+  applicability: OMNI_FULL_ONLY
+  activation_level: OMNI_FULL
+  module_instantiation_allowed: false
+  forbidden_activation_levels: [OMNI_AWARE, OMNI_MODULE]
+  full_only_sections: [Q0, GUIDED_INTAKE, FUSED_PROGRAM, MODE_SELECTION]
+phase_id: REPLACE_ME
+objective: REPLACE_ME
+authority_source: REPLACE_ME
+activation_receipt:
+  path: C:/OMNI/control/activation_receipt.json
+  bytes: 1
+  sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  decision: ACTIVATION_ALLOWED
+  activation_path: REPLACE_ME
+  task_scope: CURRENT_TASK_ONLY
+  run_kind: REPLACE_ME
+  effect_policy: REPLACE_ME
+  grant: METHOD_USE
+  non_grants: [PARTNER_SELECTION, WEB_ACCESS, DOWNLOAD, PROJECT_WRITE, EXECUTION, AUTONOMY]
+activation_level:
+  knowledge_available: true
+  skill_invoked: true
+  requested_effects: []
+  effect_authorized: false
+  level: OMNI_FULL
+  modules_used: []
+  authority_grants: [METHOD_USE, FULL_ORCHESTRATION]
+  artifact_grants: []
+  effect_grants: []
+  non_grants: [DELETE, MOVE, RENAME_OUTSIDE_ROOT, OVERWRITE_PREEXISTING_USER_FILE, EXECUTE, INSTALL, PUBLISH, EXTERNAL_EFFECTS, CREATE_FILES, ARM_AUTOMATION]
+  access_envelope_id: REPLACE_ME
+  next_gate: REPLACE_ME
+  invariant: KNOWLEDGE_AVAILABLE != SKILL_INVOKED != EFFECT_AUTHORIZED
+guided_intake_state:
+  path: C:/OMNI/control/guided_intake_state.json
+  bytes: 1
+  sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  record_digest: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  status: INTAKE_READY
+team_card:
+  path: C:/OMNI/control/team_card.json
+  bytes: 1
+  sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  status: TEAM_CARD_DUAL_ACK
+topology_selection_relay:
+  relay_id: REPLACE_ME
+  payload_path: C:/OMNI/control/topology_selection_relay.json
+  payload_bytes: 1
+  payload_sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  pm_authorization: ACCEPTED
+session_pair:
+  pair_id: REPLACE_ME
+  pair_sha256: REPLACE_ME
+  lock_status: LOCKED_UNTIL_CUTOVER
+  builder_session_id: REPLACE_ME
+  verifier_session_id: REPLACE_ME
+brains:
+  builder: C:/OMNI/brains/builder.md
+  verifier: C:/OMNI/brains/verifier.md
+mandates:
+  builder_path: C:/OMNI/control/mandato_costruttore.md
+  builder_bytes: 1
+  builder_sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  verifier_path: C:/OMNI/control/mandato_demolitore.md
+  verifier_bytes: 1
+  verifier_sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+write_lanes:
+  builder: C:/OMNI/lanes/builder
+  verifier: C:/OMNI/lanes/verifier
+workspace_access_envelope:
+  binding:
+    path: C:/OMNI/control/workspace_access_envelope.json
+    bytes: 1
+    sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  artifact:
+    schema: omni-workspace-access-envelope-v1
+    status: ACCESS_READY
+    outcome: ACCESS_GRANTED_NON_DESTRUCTIVE
+    envelope_id: ACCESS-REPLACE-ME
+    activation_receipt_sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    task_id: TASK-REPLACE-ME
+    task_root: C:/OMNI/task
+    project_root: C:/OMNI/project
+    source_roots: [C:/OMNI/sources]
+    owned_lane_root: C:/OMNI/lanes/builder
+    session_pair_sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    run_kind: REAL
+    requested_capabilities: [READ_NAMED_SOURCES, CREATE_DIRECTORIES_IN_PROJECT_ROOT, CREATE_FILES_IN_PROJECT_ROOT, WRITE_OWNED_LANE_FILES]
+    granted_capabilities: [READ_NAMED_SOURCES, CREATE_DIRECTORIES_IN_PROJECT_ROOT, CREATE_FILES_IN_PROJECT_ROOT, WRITE_OWNED_LANE_FILES]
+    non_grants: [DELETE, MOVE, RENAME_OUTSIDE_ROOT, OVERWRITE_PREEXISTING_USER_FILE, EXECUTE, INSTALL, PUBLISH, EXTERNAL_EFFECTS]
+    separate_authorizations_required: [NETWORK_RESEARCH, DOWNLOAD]
+    excluded_paths: []
+    probe_receipt_binding:
+      path: C:/OMNI/control/workspace_access_probe_receipt.json
+      bytes: 1
+      sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    record_digest: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+workspace_access_probe_receipt:
+  binding:
+    path: C:/OMNI/control/workspace_access_probe_receipt.json
+    bytes: 1
+    sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  artifact:
+    schema: omni-workspace-access-probe-receipt-v1
+    status: CREATE_ONCE_PROBE_RETAINED
+    receipt_id: PROBE-REPLACE-ME
+    envelope_id: ACCESS-REPLACE-ME
+    activation_receipt_sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    task_id: TASK-REPLACE-ME
+    task_root: C:/OMNI/task
+    project_root: C:/OMNI/project
+    source_roots: [C:/OMNI/sources]
+    owned_lane_root: C:/OMNI/lanes/builder
+    session_pair_sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    capabilities: [READ_NAMED_SOURCES, CREATE_DIRECTORIES_IN_PROJECT_ROOT, CREATE_FILES_IN_PROJECT_ROOT, WRITE_OWNED_LANE_FILES]
+    probe_path: C:/OMNI/control/create_once_probe.json
+    probe_bytes: 1
+    probe_sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    create_once: true
+    overwritten: false
+    retained: true
+    read_proofs:
+      - path: C:/OMNI/sources/input.md
+        bytes: 1
+        sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    record_digest: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+message_lane:
+  transport: PM_RELAY
+  governed_channel_equivalent: false
+  relay_ledger_path: C:/OMNI/control/relay_ledger.jsonl
+  relay_ledger_bytes: 0
+  relay_ledger_sha256: REPLACE_ME
+  last_relay_id: REPLACE_ME
+  last_payload_sha256: REPLACE_ME
+four_readback:
+  question_builder: ACK
+  question_verifier: ACK
+  answer_builder: ACK
+  answer_verifier: ACK
+knowledge_pipeline:
+  state_binding:
+    path: C:/OMNI/control/knowledge_pipeline_state.json
+    bytes: 1
+    sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  state: KNOWLEDGE_FUSION_PASS
+  well_root: C:/OMNI/project/.omni/well
+  research_brief_binding:
+    path: C:/OMNI/control/research_brief.json
+    bytes: 1
+    sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  material_join_manifest_binding:
+    path: C:/OMNI/control/material_join_manifest.json
+    bytes: 1
+    sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  effect_authority_binding:
+    path: C:/OMNI/control/knowledge_effect_authority.json
+    bytes: 1
+    sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  required_effect_grants: [NETWORK_RESEARCH]
+  optional_effect_grants: [DOWNLOAD]
+  capture_policy_without_download: CAPTURE_MD_ONLY
+  downloaded_material_policy: QUARANTINE_HASH_NEVER_EXECUTE
+  lane_access:
+    same_task_project_sources_session_pair_required: true
+    roots_must_not_overlap: true
+    builder_envelope_binding:
+      path: C:/OMNI/control/builder_lane_access_envelope.json
+      bytes: 1
+      sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    verifier_envelope_binding:
+      path: C:/OMNI/control/verifier_lane_access_envelope.json
+      bytes: 1
+      sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  lane_manifests:
+    builder:
+      path: C:/OMNI/lanes/builder/lane_freeze_manifest.json
+      bytes: 1
+      sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+      state: LANE_FROZEN
+    verifier:
+      path: C:/OMNI/lanes/verifier/lane_freeze_manifest.json
+      bytes: 1
+      sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+      state: LANE_FROZEN
+  no_oracle_contamination_before_lane_freeze: true
+  fusion:
+    pm_reserved_gate: KNOWLEDGE_FUSION
+    gate_receipt_binding:
+      path: C:/OMNI/control/knowledge_fusion_gate_receipt.json
+      bytes: 1
+      sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    artifact_binding:
+      path: C:/OMNI/fused/knowledge/knowledge_fusion.json
+      bytes: 1
+      sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    author_role: BUILDER
+    countersign_binding:
+      path: C:/OMNI/fused/knowledge/knowledge_fusion_countersign.json
+      bytes: 1
+      sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    signer_role: VERIFIER
+    distinct_author_and_signer_sessions_required: true
+    preserve: [PROVENANCE, CONFLICTS, DISSENT, EXCLUSIONS, GAPS, CONFIDENCE, FRESHNESS]
+    status: KNOWLEDGE_FUSION_PASS
+  plan_gate: PLAN_BEFORE_KNOWLEDGE_FUSION
+official_channel:
+  path: C:/OMNI/control/messages
+  status: GOVERNED_CHANNEL_READY
+  pm_relay_equivalent: false
+operating_regime:
+  pre_access_status: MODE_BEFORE_ACCESS
+  intent: REPLACE_ME_GUIDED_PM_OR_AUTONOMOUS
+  status: MODE_BEFORE_PROGRAM
+  selected: null
+  autonomy_authorized: false
+  arm_automation_authorized: false
+open_critical_question_ids: []
+program:
+  binding:
+    path: C:/OMNI/control/fused_program.json
+    bytes: 1
+    sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  artifact:
+    schema: omni-fused-program-v2
+    kind: PROGRAM_FUSION_CANDIDATE
+    status: PROGRAM_FUSION_FROZEN
+    program_id: PROGRAM-REPLACE-ME
+    task_id: TASK-REPLACE-ME
+    knowledge_pipeline_id: KNOWLEDGE-PIPELINE-REPLACE-ME
+    knowledge_state_binding:
+      path: C:/OMNI/control/knowledge_pipeline_state.json
+      bytes: 1
+      sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    knowledge_fusion_countersign_binding:
+      path: C:/OMNI/fused/knowledge/knowledge_fusion_countersign.json
+      bytes: 1
+      sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    canonical_knowledge_binding:
+      path: C:/OMNI/fused/knowledge/canonical_knowledge.md
+      bytes: 1
+      sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    session_pair_sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    author_role: BUILDER
+    author_session_id: REPLACE_ME
+    topology: TEAM_DUAL_LANE
+    profile: GODMODE
+    run_kind: REAL
+    fused_from_lanes: [BUILDER, VERIFIER]
+    builder_plan_manifest_binding:
+      path: C:/OMNI/planning/lanes/builder/plan_manifest.json
+      bytes: 1
+      sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    verifier_plan_manifest_binding:
+      path: C:/OMNI/planning/lanes/verifier/plan_manifest.json
+      bytes: 1
+      sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    fusion_decision_register_binding:
+      path: C:/OMNI/planning/fusion_decisions.json
+      bytes: 1
+      sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    fused_plan_draft_binding:
+      path: C:/OMNI/planning/fused_plan_draft.json
+      bytes: 1
+      sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    work_items:
+      - work_id: WP-REPLACE-ME
+        ordinal: 1
+        title: REPLACE_ME
+        result: REPLACE_ME_PERSISTENT_RESULT
+        persistent_artifact:
+          path: C:/OMNI/project/results/WP-REPLACE-ME.json
+          create_policy: CREATE_ONCE
+          owner_role: BUILDER
+        owner_role: BUILDER
+        depends_on: []
+        preconditions: [KNOWLEDGE_FUSION_PASS]
+        required_capabilities: [WRITE_OWNED_LANE_FILES]
+        budget:
+          max_turns: 5
+          max_tool_calls: 20
+          max_elapsed_seconds: 3600
+        acceptance_evidence:
+          - evidence_id: EVIDENCE-WP-REPLACE-ME
+            description: REPLACE_ME_BYTE_BOUND_ACCEPTANCE
+            kind: TEST_REPORT
+        verifier_role: VERIFIER
+        rollback:
+          strategy: SAFE_PARK
+          steps: [FREEZE_AND_RETAIN_LAST_VALID_BYTES]
+        failure_states: [BLOCKED_PENDING_HUMAN, INCONCLUSIVE]
+        next_gate: GATE-REPLACE-ME
+        scope: [F3_BUILD, F4_TEST]
+        origin_refs:
+          - role: BUILDER
+            work_id: WP-BUILDER-REPLACE-ME
+          - role: VERIFIER
+            work_id: WP-VERIFIER-REPLACE-ME
+    preserved_alternative_ids: []
+    preserved_dissent_ids: []
+    created_at: "2026-07-30T00:00:00Z"
+    record_digest: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+program_countersign_receipt:
+  binding:
+    path: C:/OMNI/control/program_countersign_receipt.json
+    bytes: 1
+    sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  artifact:
+    schema: omni-program-countersign-receipt-v2
+    status: PROGRAM_COUNTERSIGN_ACCEPTED
+    decision: ACCEPTED
+    receipt_id: RECEIPT-REPLACE-ME
+    program_id: PROGRAM-REPLACE-ME
+    task_id: TASK-REPLACE-ME
+    knowledge_pipeline_id: KNOWLEDGE-PIPELINE-REPLACE-ME
+    program_binding:
+      path: C:/OMNI/control/fused_program.json
+      bytes: 1
+      sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    program_record_digest: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    knowledge_state_binding:
+      path: C:/OMNI/control/knowledge_pipeline_state.json
+      bytes: 1
+      sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    knowledge_fusion_countersign_binding:
+      path: C:/OMNI/fused/knowledge/knowledge_fusion_countersign.json
+      bytes: 1
+      sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    session_pair_sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    program_author_session_id: REPLACE_ME
+    signer_role: VERIFIER
+    signer_session_id: REPLACE_ME
+    verifier_report_binding:
+      path: C:/OMNI/planning/verifier_report.json
+      bytes: 1
+      sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    reproduction:
+      schema_valid: true
+      dag_valid: true
+      full_wbs_valid: true
+      origin_coverage_complete: true
+      alternatives_preserved: true
+      dissent_preserved: true
+      no_shared_writer: true
+      no_oracle_before_dual_freeze: true
+      exact_bindings: true
+    finding_codes: []
+    evidence_bindings:
+      - path: C:/OMNI/planning/verifier_report.json
+        bytes: 1
+        sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    created_at: "2026-07-30T00:00:00Z"
+    record_digest: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+program_baptism_decision:
+  binding:
+    path: C:/OMNI/control/program_baptism_decision.json
+    bytes: 1
+    sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  artifact:
+    schema: omni-program-baptism-decision-v1
+    status: PROGRAM_BAPTISM_AUTHORIZED
+    decision: ACCEPTED
+    program_id: PROGRAM-REPLACE-ME
+    task_id: TASK-REPLACE-ME
+    knowledge_pipeline_id: KNOWLEDGE-PIPELINE-REPLACE-ME
+    session_pair_sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    program_binding:
+      path: C:/OMNI/control/fused_program.json
+      bytes: 1
+      sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    program_record_digest: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    program_countersign_binding:
+      path: C:/OMNI/control/program_countersign_receipt.json
+      bytes: 1
+      sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    program_countersign_record_digest: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    sovereign_id: PM-REPLACE-ME
+    created_at: "2026-07-30T00:00:00Z"
+    record_digest: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+program_baptism_receipt:
+  binding:
+    path: C:/OMNI/control/program_baptism_receipt.json
+    bytes: 1
+    sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  artifact:
+    schema: omni-program-baptism-receipt-v1
+    status: PROGRAM_BAPTIZED
+    decision: ACCEPTED
+    program_id: PROGRAM-REPLACE-ME
+    task_id: TASK-REPLACE-ME
+    knowledge_pipeline_id: KNOWLEDGE-PIPELINE-REPLACE-ME
+    session_pair_sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    program_binding:
+      path: C:/OMNI/control/fused_program.json
+      bytes: 1
+      sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    program_record_digest: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    program_countersign_binding:
+      path: C:/OMNI/control/program_countersign_receipt.json
+      bytes: 1
+      sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    program_countersign_record_digest: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    pm_decision_binding:
+      path: C:/OMNI/control/program_baptism_decision.json
+      bytes: 1
+      sha256: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    sovereign_id: PM-REPLACE-ME
+    created_at: "2026-07-30T00:00:00Z"
+    record_digest: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+mode_selection:
+  status: MODE_BEFORE_PROGRAM
+  intake_state_sha256: REPLACE_ME
+  intake_record_digest: REPLACE_ME
+  program_sha256: REPLACE_ME
+  program_record_digest: REPLACE_ME
+  program_countersign_receipt_sha256: REPLACE_ME
+  program_countersign_record_digest: REPLACE_ME
+  program_baptism_receipt_sha256: REPLACE_ME
+  program_baptism_record_digest: REPLACE_ME
+  workspace_access_record_digest: REPLACE_ME
+  session_pair_sha256: REPLACE_ME
+preconditions: []
+producer: REPLACE_ME
+evidence_required: []
+acceptance: []
+typed_failures: []
+status: PENDING
+reason: NOT_EVALUATED
+scope: [F3_BUILD, F4_TEST]
+forbidden: [F5_DELIVERY, INSTALLATION, PUBLICATION, EXTERNAL_EFFECTS]

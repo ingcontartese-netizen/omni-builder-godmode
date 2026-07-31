@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:omni-builder:host-adapter:1",
+  "title": "Omni host adapter classification",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "host", "host_version", "surface_id", "accessed", "official_sources", "capability_layers", "profile", "rotation", "notes"],
+  "properties": {
+    "schema": {"const": "omni-host-adapter-v1"},
+    "host": {"type": "string", "minLength": 1},
+    "host_version": {"type": "string", "minLength": 1},
+    "surface_id": {"type": "string", "minLength": 1},
+    "accessed": {"type": ["string", "object"]},
+    "official_sources": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "capability_layers": {
+      "type": "object", "additionalProperties": false,
+      "required": ["session_carrier", "host_supervisor", "ui_navigation"],
+      "properties": {"session_carrier": {"$ref": "#/$defs/layer"}, "host_supervisor": {"$ref": "#/$defs/layer"}, "ui_navigation": {"$ref": "#/$defs/layer"}}
+    },
+    "profile": {"type": "object", "additionalProperties": false, "required": ["fields", "rule"], "properties": {"fields": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true}, "rule": {"type": "string", "minLength": 1}}},
+    "rotation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["carrier", "self_spawn", "state_chain"],
+      "properties": {
+        "carrier": {"type": "string", "minLength": 1},
+        "self_spawn": {"enum": [false, "forbidden"]},
+        "state_chain": {"const": ["ROTATION_REQUESTED", "HANDOFF_FROZEN", "SUCCESSOR_CREATED", "SESSION_BOUND", "ATTACH_PASS", "RESTORE_PASS", "AUTHORITY_ENVELOPE_BOUND", "VISIBLE_SESSION_SELECTED", "PREDECESSOR_FENCE_STARTED", "PREDECESSOR_AUTHORITY_REVOKED", "PREDECESSOR_QUIESCENT", "LEASE_GRANTED", "RESUME_PASS", "WORK_ACKED", "WORK_STARTED_PROBE", "WORK_RESUMED_NOTIFIED", "PEER_COUNTERSIGN", "SUBSTANTIVE_WORK_RELEASED"]},
+        "opaque_prompt_mode": {"type": "string", "minLength": 1},
+        "emergency_use": {"type": "boolean"},
+        "peer_assistance_allowed": {"type": "boolean"}
+      }
+    },
+    "notes": {"type": "array", "items": {"type": "string"}}
+  },
+  "$defs": {"layer": {"type": "object", "additionalProperties": false, "required": ["documented", "observed", "authorized", "live_proven"], "properties": {"documented": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}, "observed": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}, "authorized": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}, "live_proven": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}}}}
+}

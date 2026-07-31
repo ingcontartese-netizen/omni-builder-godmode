@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:omni-builder:automation-arm-authority:1",
+  "title": "Omni-Builder L5 Automation Arm Authority",
+  "description": "Separate explicit authority to arm the named agentic, script and host-context sentinels. It does not itself authorize project work.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "status", "decision", "authority_id", "task_id", "program_id",
+    "operating_binding", "autonomy_authority_binding", "objective_binding",
+    "session_pair_sha256", "subject_role", "subject_session_id", "sentinel_types",
+    "script_supervisor", "agentic_sentinel", "context_sentinel", "kill_switch",
+    "arm_nonce", "one_activation", "project_effects_authorized", "non_grants",
+    "created_at", "pm_authority_record_binding", "record_digest"
+  ],
+  "properties": {
+    "schema": {"const": "omni-automation-arm-authority-v1"},
+    "status": {"const": "ARM_AUTOMATION_AUTHORIZED"},
+    "decision": {"const": "AUTHORIZED"},
+    "authority_id": {"$ref": "#/$defs/identifier"},
+    "task_id": {"$ref": "#/$defs/identifier"},
+    "program_id": {"$ref": "#/$defs/identifier"},
+    "operating_binding": {"$ref": "#/$defs/file_binding"},
+    "autonomy_authority_binding": {"$ref": "#/$defs/file_binding"},
+    "objective_binding": {"$ref": "#/$defs/file_binding"},
+    "session_pair_sha256": {"$ref": "#/$defs/sha256"},
+    "subject_role": {"const": "BUILDER"},
+    "subject_session_id": {"type": "string", "minLength": 1, "maxLength": 256},
+    "sentinel_types": {"const": ["AGENTIC", "SCRIPT", "CONTEXT"]},
+    "script_supervisor": {
+      "type": "object", "additionalProperties": false,
+      "required": ["namespace", "generation", "heartbeat_interval_seconds", "max_missed_heartbeats", "rearm_budget"],
+      "properties": {
+        "namespace": {"$ref": "#/$defs/identifier"},
+        "generation": {"type": "integer", "minimum": 1},
+        "heartbeat_interval_seconds": {"type": "integer", "minimum": 5, "maximum": 86400},
+        "max_missed_heartbeats": {"type": "integer", "minimum": 1, "maximum": 1000},
+        "rearm_budget": {"type": "integer", "minimum": 0, "maximum": 1000}
+      }
+    },
+    "agentic_sentinel": {"type": "object", "additionalProperties": false, "required": ["sentinel_id", "objective_id", "generation"], "properties": {"sentinel_id": {"$ref": "#/$defs/identifier"}, "objective_id": {"$ref": "#/$defs/identifier"}, "generation": {"type": "integer", "minimum": 1}}},
+    "context_sentinel": {"type": "object", "additionalProperties": false, "required": ["sentinel_id", "generation", "denominator", "warn_threshold", "rotate_threshold"], "properties": {"sentinel_id": {"$ref": "#/$defs/identifier"}, "generation": {"type": "integer", "minimum": 1}, "denominator": {"type": "integer", "minimum": 1}, "warn_threshold": {"type": "integer", "minimum": 1}, "rotate_threshold": {"type": "integer", "minimum": 2}}},
+    "kill_switch": {"type": "object", "additionalProperties": false, "required": ["path", "initial_binding", "initial_generation", "closed_token", "open_token"], "properties": {"path": {"$ref": "#/$defs/absolute_path"}, "initial_binding": {"$ref": "#/$defs/file_binding"}, "initial_generation": {"type": "integer", "minimum": 1}, "closed_token": {"const": "CLOSED"}, "open_token": {"const": "OPEN"}}},
+    "arm_nonce": {"$ref": "#/$defs/identifier"},
+    "one_activation": {"const": true},
+    "project_effects_authorized": {"const": false},
+    "non_grants": {"const": ["PROJECT_EXECUTION", "SENTINEL_AUTHORITY", "F5_DELIVERY", "INSTALL", "PUBLISH", "EXTERNAL_EFFECTS"]},
+    "created_at": {"type": "string", "format": "date-time"},
+    "pm_authority_record_binding": {"$ref": "#/$defs/file_binding"},
+    "record_digest": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "identifier": {"type": "string", "pattern": "^[A-Z0-9][A-Z0-9._-]{0,127}$"},
+    "absolute_path": {"type": "string", "minLength": 3, "anyOf": [{"pattern": "^[A-Za-z]:[\\\\/].+"}, {"pattern": "^(?:\\\\\\\\|//)[^\\\\/]+[\\\\/][^\\\\/]+(?:[\\\\/].*)?$"}, {"pattern": "^/.*"}]},
+    "file_binding": {"type": "object", "additionalProperties": false, "required": ["path", "bytes", "sha256"], "properties": {"path": {"$ref": "#/$defs/absolute_path"}, "bytes": {"type": "integer", "minimum": 1}, "sha256": {"$ref": "#/$defs/sha256"}}}
+  }
+}

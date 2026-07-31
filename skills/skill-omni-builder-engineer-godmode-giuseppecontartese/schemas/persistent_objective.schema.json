@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:omni-builder:persistent-objective:1",
+  "title": "Omni-Builder L5 Persistent Objective",
+  "description": "A bounded, physically observable and proven-satisfiable objective. Narrative-only terminal conditions are not valid authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "status", "objective_id", "task_id", "program_id", "session_pair_sha256",
+    "program_countersign_binding", "description", "completion_definition",
+    "satisfiability", "terminal_verification_mode", "terminal_conditions",
+    "stop_conditions", "budgets", "scope", "forbidden_effects", "created_at",
+    "pm_authority_record_binding", "record_digest"
+  ],
+  "properties": {
+    "schema": {"const": "omni-persistent-objective-v1"},
+    "status": {"const": "OBJECTIVE_BOUND"},
+    "objective_id": {"$ref": "#/$defs/identifier"},
+    "task_id": {"$ref": "#/$defs/identifier"},
+    "program_id": {"$ref": "#/$defs/identifier"},
+    "session_pair_sha256": {"$ref": "#/$defs/sha256"},
+    "program_countersign_binding": {"$ref": "#/$defs/file_binding"},
+    "description": {"type": "string", "minLength": 1, "maxLength": 4096},
+    "completion_definition": {"type": "string", "minLength": 1, "maxLength": 4096},
+    "satisfiability": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "proof_bindings", "blocking_assumptions"],
+      "properties": {
+        "status": {"enum": ["PROVEN_SATISFIABLE", "UNSATISFIABLE", "INCONCLUSIVE"]},
+        "proof_bindings": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/file_binding"}},
+        "blocking_assumptions": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "terminal_verification_mode": {"const": "ALL_PHYSICAL"},
+    "terminal_conditions": {"type": "array", "minItems": 1, "maxItems": 32, "uniqueItems": true, "items": {"$ref": "#/$defs/terminal_condition"}},
+    "stop_conditions": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["OBJECTIVE_ACHIEVED", "KILL_SWITCH_OPEN", "BUDGET_EXHAUSTED", "AUTHORITY_REVOKED", "BLOCKING_FAILURE"]}},
+    "budgets": {"$ref": "#/$defs/budgets"},
+    "scope": {"const": ["F3_BUILD", "F4_TEST"]},
+    "forbidden_effects": {"const": ["F5_DELIVERY", "INSTALL", "PUBLISH", "EXTERNAL_EFFECTS"]},
+    "created_at": {"type": "string", "format": "date-time"},
+    "pm_authority_record_binding": {"$ref": "#/$defs/file_binding"},
+    "record_digest": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "identifier": {"type": "string", "pattern": "^[A-Z0-9][A-Z0-9._-]{0,127}$"},
+    "absolute_path": {
+      "type": "string", "minLength": 3,
+      "anyOf": [
+        {"pattern": "^[A-Za-z]:[\\\\/].+"},
+        {"pattern": "^(?:\\\\\\\\|//)[^\\\\/]+[\\\\/][^\\\\/]+(?:[\\\\/].*)?$"},
+        {"pattern": "^/.*"}
+      ]
+    },
+    "file_binding": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "bytes", "sha256"],
+      "properties": {"path": {"$ref": "#/$defs/absolute_path"}, "bytes": {"type": "integer", "minimum": 1}, "sha256": {"$ref": "#/$defs/sha256"}}
+    },
+    "budgets": {
+      "type": "object", "additionalProperties": false,
+      "required": ["max_turns", "max_tool_calls", "max_writes", "max_elapsed_seconds", "max_rearms"],
+      "properties": {
+        "max_turns": {"type": "integer", "minimum": 1, "maximum": 10000},
+        "max_tool_calls": {"type": "integer", "minimum": 1, "maximum": 100000},
+        "max_writes": {"type": "integer", "minimum": 1, "maximum": 100000},
+        "max_elapsed_seconds": {"type": "integer", "minimum": 1, "maximum": 31536000},
+        "max_rearms": {"type": "integer", "minimum": 0, "maximum": 1000}
+      }
+    },
+    "terminal_condition": {
+      "type": "object", "additionalProperties": false,
+      "required": ["condition_id", "evaluator", "subject_binding", "json_pointer", "expected_value", "observable", "proof_required"],
+      "properties": {
+        "condition_id": {"$ref": "#/$defs/identifier"},
+        "evaluator": {"enum": ["FILE_SHA256_EQUALS", "JSON_POINTER_EQUALS", "RECEIPT_STATUS_EQUALS", "CHANNEL_RECORD_EXISTS", "TEST_REPORT_PASS"]},
+        "subject_binding": {"$ref": "#/$defs/file_binding"},
+        "json_pointer": {"type": ["string", "null"], "pattern": "^/.*"},
+        "expected_value": {"type": ["string", "boolean", "integer", "null"]},
+        "observable": {"const": true},
+        "proof_required": {"const": true}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"evaluator": {"enum": ["JSON_POINTER_EQUALS", "RECEIPT_STATUS_EQUALS", "TEST_REPORT_PASS"]}}, "required": ["evaluator"]},
+          "then": {"properties": {"json_pointer": {"type": "string", "pattern": "^/.+"}}}
+        },
+        {
+          "if": {"properties": {"evaluator": {"enum": ["FILE_SHA256_EQUALS", "CHANNEL_RECORD_EXISTS"]}}, "required": ["evaluator"]},
+          "then": {"properties": {"json_pointer": {"type": "null"}}}
+        }
+      ]
+    }
+  }
+}

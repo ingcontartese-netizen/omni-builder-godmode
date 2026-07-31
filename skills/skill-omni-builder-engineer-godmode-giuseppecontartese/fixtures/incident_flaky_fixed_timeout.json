@@ -1,0 +1,13 @@
+{
+  "schema": "omni-incident-fixture-v1",
+  "id": "PB-018-FLAKY-FIXED-TIMEOUT",
+  "control": "liveness_windows",
+  "input": {
+    "timeout_elapsed": true,
+    "session_live": true,
+    "workflow_live": true,
+    "delivery_observed": false,
+    "under_load_positive_control": {"id": "IDP_N05", "passes": 10, "trials": 10}
+  },
+  "expected": {"must_not_fail": true, "state": "WORKFLOW_LIVE_DELIVERY_PENDING", "under_load_positive_control_passes": true}
+}

@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:omni-builder:program-baptism-decision:1",
+  "title": "Omni-Builder Sovereign Program Baptism Decision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "status", "decision", "program_id", "task_id",
+    "knowledge_pipeline_id", "session_pair_sha256", "program_binding",
+    "program_record_digest", "program_countersign_binding",
+    "program_countersign_record_digest", "sovereign_id", "created_at",
+    "record_digest"
+  ],
+  "properties": {
+    "schema": {"const": "omni-program-baptism-decision-v1"},
+    "status": {"const": "PROGRAM_BAPTISM_AUTHORIZED"},
+    "decision": {"const": "ACCEPTED"},
+    "program_id": {"$ref": "#/$defs/identifier"},
+    "task_id": {"$ref": "#/$defs/identifier"},
+    "knowledge_pipeline_id": {"$ref": "#/$defs/identifier"},
+    "session_pair_sha256": {"$ref": "#/$defs/sha256"},
+    "program_binding": {"$ref": "#/$defs/file_binding"},
+    "program_record_digest": {"$ref": "#/$defs/sha256"},
+    "program_countersign_binding": {"$ref": "#/$defs/file_binding"},
+    "program_countersign_record_digest": {"$ref": "#/$defs/sha256"},
+    "sovereign_id": {"type": "string", "minLength": 1, "maxLength": 256},
+    "created_at": {"type": "string", "format": "date-time"},
+    "record_digest": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "identifier": {"type": "string", "pattern": "^[A-Z0-9][A-Z0-9._-]{0,127}$"},
+    "absolute_path": {
+      "type": "string", "minLength": 3,
+      "anyOf": [
+        {"pattern": "^[A-Za-z]:[\\\\/].+"},
+        {"pattern": "^(?:\\\\\\\\|//)[^\\\\/]+[\\\\/][^\\\\/]+(?:[\\\\/].*)?$"},
+        {"pattern": "^/.*"}
+      ]
+    },
+    "file_binding": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "bytes", "sha256"],
+      "properties": {
+        "path": {"$ref": "#/$defs/absolute_path"},
+        "bytes": {"type": "integer", "minimum": 1},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      }
+    }
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "schema": "omni-incident-fixture-v1",
+  "id": "PB-001-003-MOVING-INPUT-OR-ORDINAL-COLLISION",
+  "control": "freeze_and_partition",
+  "input": {"pre_sha256": "A", "post_sha256": "B", "ordinals": [7, 7]},
+  "expected": {"must_fail": true, "reasons": ["MOVING_INPUT", "ORDINAL_COLLISION"]}
+}

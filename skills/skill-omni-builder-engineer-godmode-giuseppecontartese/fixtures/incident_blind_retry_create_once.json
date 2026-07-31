@@ -1,0 +1,7 @@
+{
+  "schema": "omni-incident-fixture-v1",
+  "id": "PB-025-BLIND-RETRY-CREATE-ONCE",
+  "control": "create_once_readback",
+  "input": {"ui_error": true, "file_exists": true, "observed_sha256_equals_expected": true},
+  "expected": {"retry": false, "outcome": "ALREADY_PRESENT_IDENTICAL"}
+}

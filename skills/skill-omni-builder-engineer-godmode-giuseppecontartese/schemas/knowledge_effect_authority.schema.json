@@ -1,0 +1,401 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:omni-builder:knowledge-effect-authority:1",
+  "title": "Omni-Builder Knowledge Effect Authority",
+  "description": "Create-once authority for exactly one L3 transition. Network research and download are separate, physically bound decisions. No action in this schema grants planning, execution, autonomy, delivery, installation, publication, or external effects.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "status",
+    "decision",
+    "authority_id",
+    "action",
+    "task_id",
+    "pipeline_id",
+    "intake_state_sha256",
+    "session_pair_sha256",
+    "subject_role",
+    "subject_session_id",
+    "workspace_access_envelope_binding",
+    "well_root",
+    "input_bindings",
+    "output_paths",
+    "network_research",
+    "download",
+    "one_shot",
+    "operation_nonce",
+    "non_grants",
+    "created_at",
+    "record_digest"
+  ],
+  "properties": {
+    "schema": {
+      "const": "omni-knowledge-effect-authority-v1"
+    },
+    "status": {
+      "enum": [
+        "EFFECT_AUTHORIZED",
+        "AUTHORIZED",
+        "EFFECT_DENIED",
+        "DENIED",
+        "EFFECT_UNAVAILABLE",
+        "UNAVAILABLE"
+      ]
+    },
+    "decision": {
+      "enum": [
+        "AUTHORIZED",
+        "DENIED",
+        "UNAVAILABLE"
+      ]
+    },
+    "authority_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "action": {
+      "enum": [
+        "WELL_BOOTSTRAP",
+        "WELL_READY",
+        "MATERIAL_QUARANTINE",
+        "MATERIAL_JOIN",
+        "LANE_LIGHT_WEB_RESEARCH",
+        "LANE_DEEP_PLAN",
+        "LANE_DEEP_WEB_RESEARCH",
+        "LANE_DEEP_DOSSIER",
+        "LANE_FREEZE",
+        "FUSION_EMIT",
+        "FUSION_COUNTERSIGN"
+      ]
+    },
+    "task_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "pipeline_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "intake_state_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "session_pair_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "subject_role": {
+      "enum": [
+        "BUILDER",
+        "VERIFIER"
+      ]
+    },
+    "subject_session_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "workspace_access_envelope_binding": {
+      "$ref": "#/$defs/file_binding"
+    },
+    "well_root": {
+      "$ref": "#/$defs/absolute_path"
+    },
+    "input_bindings": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/file_binding"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "output_paths": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/absolute_path"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "network_research": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/effect_decision"
+        },
+        {
+          "properties": {
+            "effect": {
+              "const": "NETWORK_RESEARCH"
+            }
+          }
+        }
+      ]
+    },
+    "download": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/effect_decision"
+        },
+        {
+          "properties": {
+            "effect": {
+              "const": "DOWNLOAD"
+            }
+          }
+        }
+      ]
+    },
+    "one_shot": {
+      "const": true
+    },
+    "operation_nonce": {
+      "$ref": "#/$defs/identifier"
+    },
+    "non_grants": {
+      "const": [
+        "DELETE",
+        "MOVE",
+        "RENAME_OUTSIDE_ROOT",
+        "OVERWRITE_PREEXISTING_USER_FILE",
+        "EXECUTE",
+        "INSTALL",
+        "PUBLISH",
+        "EXTERNAL_EFFECTS"
+      ]
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "record_digest": {
+      "$ref": "#/$defs/sha256"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "EFFECT_AUTHORIZED",
+              "AUTHORIZED"
+            ]
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "decision": {
+            "const": "AUTHORIZED"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "EFFECT_DENIED",
+              "DENIED"
+            ]
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "decision": {
+            "const": "DENIED"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "EFFECT_UNAVAILABLE",
+              "UNAVAILABLE"
+            ]
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "decision": {
+            "const": "UNAVAILABLE"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "action": {
+            "enum": [
+              "LANE_LIGHT_WEB_RESEARCH",
+              "LANE_DEEP_WEB_RESEARCH"
+            ]
+          },
+          "decision": {
+            "const": "AUTHORIZED"
+          }
+        },
+        "required": [
+          "action",
+          "decision"
+        ]
+      },
+      "then": {
+        "properties": {
+          "network_research": {
+            "properties": {
+              "status": {
+                "const": "AUTHORIZED"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "download": {
+            "properties": {
+              "status": {
+                "const": "AUTHORIZED"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          }
+        },
+        "required": [
+          "download"
+        ]
+      },
+      "then": {
+        "properties": {
+          "download": {
+            "properties": {
+              "handling_policy": {
+                "const": "QUARANTINE_HASH_NEVER_EXECUTE"
+              }
+            }
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "download": {
+            "properties": {
+              "handling_policy": {
+                "const": "NO_RAW_DOWNLOAD"
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[A-F0-9]{64}$"
+    },
+    "identifier": {
+      "type": "string",
+      "pattern": "^[A-Z0-9][A-Z0-9._-]{0,127}$"
+    },
+    "absolute_path": {
+      "type": "string",
+      "minLength": 3,
+      "anyOf": [
+        {
+          "pattern": "^[A-Za-z]:[\\\\/].+"
+        },
+        {
+          "pattern": "^(?:\\\\\\\\|//)[^\\\\/]+[\\\\/][^\\\\/]+(?:[\\\\/].*)?$"
+        },
+        {
+          "pattern": "^/.*"
+        }
+      ]
+    },
+    "file_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "bytes",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/absolute_path"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "effect_decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "effect",
+        "status",
+        "authority_source_binding",
+        "scope_paths",
+        "handling_policy"
+      ],
+      "properties": {
+        "effect": {
+          "enum": [
+            "NETWORK_RESEARCH",
+            "DOWNLOAD"
+          ]
+        },
+        "status": {
+          "enum": [
+            "AUTHORIZED",
+            "DENIED",
+            "UNAVAILABLE",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "authority_source_binding": {
+          "$ref": "#/$defs/file_binding"
+        },
+        "scope_paths": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/absolute_path"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "handling_policy": {
+          "enum": [
+            "CAPTURE_MD_ONLY",
+            "QUARANTINE_HASH_NEVER_EXECUTE",
+            "NO_RAW_DOWNLOAD",
+            "NOT_APPLICABLE"
+          ]
+        }
+      }
+    }
+  }
+}

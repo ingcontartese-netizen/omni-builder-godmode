@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:omni-builder:operating-state:1",
+  "title": "Omni-Builder L5 Hash-Chained Operating State",
+  "description": "Create-once CAS state for regime selection, one guided PM turn, or bounded autonomous activation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "status", "state_id", "state_seq", "previous_state_binding",
+    "task_id", "program_id", "knowledge_pipeline_id", "regime", "regime_binding",
+    "fused_program_binding", "program_countersign_binding", "session_pair_sha256",
+    "owner_role", "owner_session_id", "guided_turn_authority_binding",
+    "objective_binding", "autonomy_authority_binding", "arm_authority_binding",
+    "sentinel_bundle_binding", "execution_lease_binding", "authorized_effects",
+    "effects_authorized", "automation_armed", "single_writer", "budget_snapshot",
+    "kill_switch_path", "kill_switch_generation", "official_channel_binding", "trusted_pm_root",
+    "trusted_pm_issuer_id", "last_effect", "finding_codes", "created_at",
+    "record_digest"
+  ],
+  "properties": {
+    "schema": {"const": "omni-operating-state-v1"},
+    "status": {"enum": ["REGIME_BOUND", "GUIDED_TURN_READY", "AUTONOMY_ACTIVE", "OPERATING_STOPPED", "OPERATING_BLOCKED", "OPERATING_INCONCLUSIVE"]},
+    "state_id": {"$ref": "#/$defs/identifier"},
+    "state_seq": {"type": "integer", "minimum": 0},
+    "previous_state_binding": {"oneOf": [{"$ref": "#/$defs/file_binding"}, {"type": "null"}]},
+    "task_id": {"$ref": "#/$defs/identifier"},
+    "program_id": {"$ref": "#/$defs/identifier"},
+    "knowledge_pipeline_id": {"$ref": "#/$defs/identifier"},
+    "regime": {"enum": ["GUIDED_PM", "AUTONOMOUS"]},
+    "regime_binding": {"$ref": "#/$defs/file_binding"},
+    "fused_program_binding": {"$ref": "#/$defs/file_binding"},
+    "program_countersign_binding": {"$ref": "#/$defs/file_binding"},
+    "session_pair_sha256": {"$ref": "#/$defs/sha256"},
+    "owner_role": {"const": "BUILDER"},
+    "owner_session_id": {"type": "string", "minLength": 1, "maxLength": 256},
+    "guided_turn_authority_binding": {"oneOf": [{"$ref": "#/$defs/file_binding"}, {"type": "null"}]},
+    "objective_binding": {"oneOf": [{"$ref": "#/$defs/file_binding"}, {"type": "null"}]},
+    "autonomy_authority_binding": {"oneOf": [{"$ref": "#/$defs/file_binding"}, {"type": "null"}]},
+    "arm_authority_binding": {"oneOf": [{"$ref": "#/$defs/file_binding"}, {"type": "null"}]},
+    "sentinel_bundle_binding": {"oneOf": [{"$ref": "#/$defs/file_binding"}, {"type": "null"}]},
+    "execution_lease_binding": {"oneOf": [{"$ref": "#/$defs/file_binding"}, {"type": "null"}]},
+    "authorized_effects": {"type": "array", "uniqueItems": true, "items": {"enum": ["F3_BUILD", "F4_TEST", "PROJECT_WRITE", "TEST_EXECUTION", "OFFICIAL_CHANNEL_WRITE", "STATE_CHECKPOINT", "HANDOFF_FREEZE"]}},
+    "effects_authorized": {"type": "boolean"},
+    "automation_armed": {"type": "boolean"},
+    "single_writer": {"type": "boolean"},
+    "budget_snapshot": {"oneOf": [{"$ref": "#/$defs/budget_snapshot"}, {"type": "null"}]},
+    "kill_switch_path": {"type": ["string", "null"], "minLength": 3},
+    "kill_switch_generation": {"type": ["integer", "null"], "minimum": 1},
+    "official_channel_binding": {"$ref": "#/$defs/file_binding"},
+    "trusted_pm_root": {"$ref": "#/$defs/absolute_path"},
+    "trusted_pm_issuer_id": {"$ref": "#/$defs/identifier"},
+    "last_effect": {"oneOf": [{"$ref": "#/$defs/effect_consumption"}, {"type": "null"}]},
+    "finding_codes": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/identifier"}},
+    "created_at": {"type": "string", "format": "date-time"},
+    "record_digest": {"$ref": "#/$defs/sha256"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"status": {"const": "REGIME_BOUND"}}, "required": ["status"]},
+      "then": {"properties": {"state_seq": {"const": 0}, "guided_turn_authority_binding": {"type": "null"}, "objective_binding": {"type": "null"}, "autonomy_authority_binding": {"type": "null"}, "arm_authority_binding": {"type": "null"}, "sentinel_bundle_binding": {"type": "null"}, "execution_lease_binding": {"type": "null"}, "authorized_effects": {"const": []}, "effects_authorized": {"const": false}, "automation_armed": {"const": false}, "single_writer": {"const": false}, "budget_snapshot": {"type": "null"}, "kill_switch_path": {"type": "null"}, "kill_switch_generation": {"type": "null"}, "last_effect": {"type": "null"}, "finding_codes": {"const": []}}}
+    },
+    {
+      "if": {"properties": {"status": {"const": "GUIDED_TURN_READY"}}, "required": ["status"]},
+      "then": {"properties": {"guided_turn_authority_binding": {"$ref": "#/$defs/file_binding"}, "objective_binding": {"type": "null"}, "autonomy_authority_binding": {"type": "null"}, "arm_authority_binding": {"type": "null"}, "sentinel_bundle_binding": {"type": "null"}, "execution_lease_binding": {"type": "null"}, "authorized_effects": {"minItems": 1}, "effects_authorized": {"const": true}, "automation_armed": {"const": false}, "single_writer": {"const": true}, "budget_snapshot": {"type": "null"}, "kill_switch_path": {"type": "null"}, "kill_switch_generation": {"type": "null"}, "last_effect": {"type": "null"}, "finding_codes": {"const": []}}}
+    },
+    {
+      "if": {"properties": {"status": {"const": "AUTONOMY_ACTIVE"}}, "required": ["status"]},
+      "then": {"properties": {"guided_turn_authority_binding": {"type": "null"}, "objective_binding": {"$ref": "#/$defs/file_binding"}, "autonomy_authority_binding": {"$ref": "#/$defs/file_binding"}, "arm_authority_binding": {"$ref": "#/$defs/file_binding"}, "sentinel_bundle_binding": {"$ref": "#/$defs/file_binding"}, "execution_lease_binding": {"$ref": "#/$defs/file_binding"}, "authorized_effects": {"minItems": 1}, "effects_authorized": {"const": true}, "automation_armed": {"const": true}, "single_writer": {"const": true}, "budget_snapshot": {"$ref": "#/$defs/budget_snapshot"}, "kill_switch_path": {"type": "string", "minLength": 3}, "kill_switch_generation": {"type": "integer", "minimum": 1}, "finding_codes": {"const": []}}}
+    },
+    {
+      "if": {"properties": {"status": {"enum": ["OPERATING_STOPPED", "OPERATING_BLOCKED", "OPERATING_INCONCLUSIVE"]}}, "required": ["status"]},
+      "then": {"properties": {"authorized_effects": {"const": []}, "effects_authorized": {"const": false}, "automation_armed": {"const": false}, "single_writer": {"const": false}, "finding_codes": {"minItems": 1}}}
+    }
+  ],
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "identifier": {"type": "string", "pattern": "^[A-Z0-9][A-Z0-9._-]{0,127}$"},
+    "absolute_path": {"type": "string", "minLength": 3, "anyOf": [{"pattern": "^[A-Za-z]:[\\\\/].+"}, {"pattern": "^(?:\\\\\\\\|//)[^\\\\/]+[\\\\/][^\\\\/]+(?:[\\\\/].*)?$"}, {"pattern": "^/.*"}]},
+    "file_binding": {"type": "object", "additionalProperties": false, "required": ["path", "bytes", "sha256"], "properties": {"path": {"$ref": "#/$defs/absolute_path"}, "bytes": {"type": "integer", "minimum": 1}, "sha256": {"$ref": "#/$defs/sha256"}}},
+    "budget_snapshot": {"type": "object", "additionalProperties": false, "required": ["max_turns", "max_tool_calls", "max_writes", "max_elapsed_seconds", "max_rearms", "used_turns", "used_tool_calls", "used_writes", "used_elapsed_seconds", "used_rearms", "started_at_unix_ms", "last_checked_at_unix_ms"], "properties": {"max_turns": {"type": "integer", "minimum": 1}, "max_tool_calls": {"type": "integer", "minimum": 1}, "max_writes": {"type": "integer", "minimum": 1}, "max_elapsed_seconds": {"type": "integer", "minimum": 1}, "max_rearms": {"type": "integer", "minimum": 0}, "used_turns": {"type": "integer", "minimum": 0}, "used_tool_calls": {"type": "integer", "minimum": 0}, "used_writes": {"type": "integer", "minimum": 0}, "used_elapsed_seconds": {"type": "integer", "minimum": 0}, "used_rearms": {"type": "integer", "minimum": 0}, "started_at_unix_ms": {"type": "integer", "minimum": 1}, "last_checked_at_unix_ms": {"type": "integer", "minimum": 1}}},
+    "effect_consumption": {"type": "object", "additionalProperties": false, "required": ["effect", "action_id", "target_path", "output_path", "idempotency_key", "fingerprint", "consumed_at"], "properties": {"effect": {"enum": ["F3_BUILD", "F4_TEST", "PROJECT_WRITE", "TEST_EXECUTION", "OFFICIAL_CHANNEL_WRITE", "STATE_CHECKPOINT", "HANDOFF_FREEZE"]}, "action_id": {"$ref": "#/$defs/identifier"}, "target_path": {"$ref": "#/$defs/absolute_path"}, "output_path": {"$ref": "#/$defs/absolute_path"}, "idempotency_key": {"$ref": "#/$defs/identifier"}, "fingerprint": {"$ref": "#/$defs/sha256"}, "consumed_at": {"type": "string", "format": "date-time"}}}
+  }
+}

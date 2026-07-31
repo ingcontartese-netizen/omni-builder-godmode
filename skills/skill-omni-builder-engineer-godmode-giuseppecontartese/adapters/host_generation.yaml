@@ -1,0 +1,42 @@
+schema: omni-host-generation-v1
+generation: 2
+classification_levels: [DOCUMENTED, OBSERVED, AUTHORIZED, LIVE_PROVEN]
+capability_layers: [SESSION_CARRIER, HOST_SUPERVISOR, UI_NAVIGATION]
+rotation_state_chain: [ROTATION_REQUESTED, HANDOFF_FROZEN, SUCCESSOR_CREATED, SESSION_BOUND, ATTACH_PASS, RESTORE_PASS, AUTHORITY_ENVELOPE_BOUND, VISIBLE_SESSION_SELECTED, PREDECESSOR_FENCE_STARTED, PREDECESSOR_AUTHORITY_REVOKED, PREDECESSOR_QUIESCENT, LEASE_GRANTED, RESUME_PASS, WORK_ACKED, WORK_STARTED_PROBE, WORK_RESUMED_NOTIFIED, PEER_COUNTERSIGN, SUBSTANTIVE_WORK_RELEASED]
+required_profile_fields:
+  - host
+  - host_version
+  - runtime_version_tuple
+  - surface_id
+  - model
+  - reasoning_effort
+  - effort_ui_label
+  - effort_runtime_key
+  - effort_mapping_evidence
+  - permission_surface
+  - project_root
+  - source_snapshot_sha256
+  - session_id
+  - predecessor_session_id
+  - objective_sha256
+  - agentic_sentinel_id
+  - script_sentinel_generation
+  - context_sentinel
+  - tool_inventory_sha256
+profile_policy:
+  freeze_before_successor: true
+  compare_after_attach: true
+  compare_after_resume: true
+  exact_model_and_effort_required: true
+  preserve_raw_ui_and_runtime_effort_values: true
+  implicit_effort_label_mapping_forbidden: true
+  degraded_action: PROFILE_DEGRADED_REDUCE_AUTHORITY_AND_REVERIFY
+authority:
+  inherited: false
+  f5_delivery: false
+  installation: false
+  publication: false
+  external_effects: false
+evidence_rule: >-
+  A documented verb is not an observed runtime, an observed runtime is not
+  authorization, and authorization is not a successful live rehearsal.

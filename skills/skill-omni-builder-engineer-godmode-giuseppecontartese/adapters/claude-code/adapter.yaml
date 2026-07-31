@@ -1,0 +1,38 @@
+schema: omni-host-adapter-v1
+host: anthropic-claude-code
+host_version: "Claude Desktop 1.24012.9.0; embedded Claude Code 2.1.219; PATH Claude CLI 2.1.150"
+surface_id: claude-code-desktop
+accessed: 2026-07-30
+official_sources: [https://code.claude.com/docs/en/slash-commands, https://code.claude.com/docs/en/cli-reference, https://code.claude.com/docs/en/how-claude-code-works]
+capability_layers:
+  session_carrier:
+    documented: [continue, resume, fork_session, session_id, output_format_json, model]
+    observed: [resume_id, fork_session, desktop_session_switch]
+    authorized: [resume_id, fork_session, desktop_session_switch]
+    live_proven: [distinct_successor_session, attach_restore_resume_chain]
+  host_supervisor:
+    documented: [agent_view_dispatch_attach_respawn]
+    observed: [subagent_dispatch]
+    authorized: [subagent_dispatch]
+    live_proven: []
+  ui_navigation:
+    documented: [desktop_session_switch]
+    observed: [desktop_session_switch]
+    authorized: [desktop_session_switch]
+    live_proven: [visible_session_selected_readback]
+profile:
+  fields: [surface_id, runtime_version_tuple, model, effort_ui_label, effort_runtime_key, effort_mapping_evidence, permission_mode, project_root, session_id, tool_inventory, objective, agentic_sentinel, script_sentinel, context_sentinel]
+  rule: freeze_exact_profile_and_verify_after_native_successor_binding
+rotation:
+  carrier: native_resume_plus_fork_session
+  self_spawn: forbidden
+  state_chain: [ROTATION_REQUESTED, HANDOFF_FROZEN, SUCCESSOR_CREATED, SESSION_BOUND, ATTACH_PASS, RESTORE_PASS, AUTHORITY_ENVELOPE_BOUND, VISIBLE_SESSION_SELECTED, PREDECESSOR_FENCE_STARTED, PREDECESSOR_AUTHORITY_REVOKED, PREDECESSOR_QUIESCENT, LEASE_GRANTED, RESUME_PASS, WORK_ACKED, WORK_STARTED_PROBE, WORK_RESUMED_NOTIFIED, PEER_COUNTERSIGN, SUBSTANTIVE_WORK_RELEASED]
+  opaque_prompt_mode: unqualified
+  emergency_use: true
+  peer_assistance_allowed: true
+notes:
+  - The delivery target is ~/.claude/skills/<skill-name>/SKILL.md; disable-model-invocation must be absent or false so explicit natural-language requests and motivated proposals can load the Skill. Loading routes to Station 0 and grants nothing.
+  - A loaded description or passive method fact is knowledge availability, not Skill invocation or effect authority.
+  - Carrier qualification does not prove supervisor or UI qualification.
+  - Use native distinct sessions; a compacted conversation is continuity, not rotation proof.
+  - Desktop package, embedded Claude Code, and PATH CLI versions are separate and must never be substituted for one another.

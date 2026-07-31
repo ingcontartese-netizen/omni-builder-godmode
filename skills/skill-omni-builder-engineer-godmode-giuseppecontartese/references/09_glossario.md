@@ -1,0 +1,71 @@
+# Canonical glossary
+
+- **Activation receipt:** byte-bound `omni-invocation-decision-v2` record for `CURRENT_TASK_ONLY`; full-orchestration `ACTIVATION_ALLOWED` grants only `METHOD_USE`, while a named-module branch uses `MODULE_ACTIVATION_ALLOWED`; AWARE emits no activation receipt.
+- **Activation path:** exactly `EXPLICIT_USER_OPT_IN` or `PROPOSAL_ACCEPTED`; it is reread from the bound receipt, never self-declared downstream.
+- **Activation non-grant:** one of `PARTNER_SELECTION`, `WEB_ACCESS`, `DOWNLOAD`, `PROJECT_WRITE`, `EXECUTION`, or `AUTONOMY`; activation leaves all six closed.
+- **Activation level:** progressive `OMNI_AWARE`, `OMNI_MODULE`, or `OMNI_FULL` scope; its trace separates `authority_grants`, `artifact_grants`, and `effect_grants`, never silently upgrades, and never itself authorizes effects.
+- **Omni module:** explicitly requested or accepted sole named module for the current task; the explicit named-module request itself is consent, so no redundant prompt is required. One `MODULE_ACTIVATION_ALLOWED` receipt binds exactly one real packaged module as `modules_used=[THE_ONE_MODULE]`; adding or replacing it requires a new receipt. It must resolve to a real packaged surface or fail `UNKNOWN_MODULE_REQUESTED`; it runs a module-specific mini-contract, ends at a typed module outcome, never enters full guided intake, and keeps file/tool/effect authority separately gated.
+- **Knowledge research dossier:** packaged `KNOWLEDGE_RESEARCH_DOSSIER` module that turns one named topic plus named material into material study, light map, deep research, source manifest, and provenance dossier; its only success is `KNOWLEDGE_RESEARCH_DOSSIER_READY -> STOP`.
+- **Effect authorization:** physical, scoped authority for a named effect; `KNOWLEDGE_AVAILABLE != SKILL_INVOKED != EFFECT_AUTHORIZED`.
+- **Knowledge effect authority:** byte-bound grant for one knowledge-side effect such as `NETWORK_RESEARCH` or `DOWNLOAD`; mandatory research creates a gate obligation, never authority.
+- **ARM_AUTOMATION:** separate explicit grant that permits named sentinels, monitors, wakeups, or governors to be armed inside a bounded autonomous envelope; selecting autonomous intent, possessing scripts, or restoring a goal does not imply it.
+- **MODE_BEFORE_ACCESS:** pre-operational state in which guided/autonomous intent may be discussed but no Mode may be selected because physical access and downstream effect authorities are not yet closed.
+- **Arm automation:** canonical prose name for the `ARM_AUTOMATION` grant; it remains separate from autonomy intent and capability.
+- **Mode before access:** canonical prose name for `MODE_BEFORE_ACCESS`, the typed stop before physical access and effect authority close.
+- **MODE_BEFORE_PROGRAM:** state after intake/knowledge work in which no operating Mode is selectable until the fused realization program and its independent countersign are physically bound.
+- **Run kind:** `REAL` or `DRY_RUN`; it binds the effect policy and never grants an effect.
+- **Effect policy:** `DOWNSTREAM_GATED_REAL` or `SIMULATE_WITHOUT_MATERIALIZATION`, derived from run kind.
+- **Guided intake:** ordered L2 corridor available only to explicit `OMNI_FULL`, from activation binding through `INTAKE_READY`; AWARE and MODULE never enter it, and it is not execution.
+- **Topology:** `TEAM_DUAL_LANE` or `SOLO_DUAL_HAT`, selected at Q0.
+- **Brain:** separately restorable context, mandate, identity, and evidence state bound to one native session.
+- **Lane:** exclusive write/ownership surface of one brain; another lane may read frozen bytes but may not cross-write.
+- **Lane dossier:** one lane's provenance-complete synthesis after material review, light mapping, deep-plan freeze, and deep research; it is not shared as an answer key before lane freeze.
+- **Lane freeze:** create-once binding of a lane dossier, source/capture manifest, bytes, hashes, and state `LANE_FROZEN`.
+- **Light map:** first web-research freeze mapping source families, primary authorities, gaps, current tools, and deep-research leads; it is not the final knowledge base.
+- **Deep plan:** frozen lane-owned research plan derived from the light map, with questions, source priorities, freshness requirements, and stop conditions.
+- **CAPTURE_MD_ONLY:** network-research mode used when `NETWORK_RESEARCH` is granted but `DOWNLOAD` is not; it captures provenance-rich Markdown without retaining raw downloaded source files.
+- **No-oracle contamination:** requirement that neither lane consume the peer's synthesis before both lane freezes; common primary sources and the shared brief are allowed, peer answer leakage is not.
+- **Governed channel:** authoritative, ordered, byte-bound inter-agent transport for state transitions and evidence references; PM relay or UI narration is not equivalent.
+- **Per-writer relay ledger:** append-only stream owned by one physical writer, identified by `(run_id, stream_id, stream_seq)` plus `event_id`; it has a full-entry hash chain, lease/fence, crash reconciliation, vector checkpoints, sealed-volume rotation, and no shared global sequence allocator.
+- **External ledger anchor:** create-once binding of vector heads held outside the ledger root. Its trust is only as strong as the caller-qualified external credential/failure domain; a second local path alone remains unqualified.
+- **Knowledge fusion pass:** `KNOWLEDGE_FUSION_PASS`, reached only when both lanes are frozen, the PM-reserved fusion gate is open, the builder emits a provenance-complete create-once fusion, and the distinct verifier countersigns its exact bytes.
+- **Session pair:** immutable builder/verifier native-session binding, digest-locked as `LOCKED_UNTIL_CUTOVER`.
+- **Team Card:** digest-bound identities, roles, ownership, order, prohibitions, PM-reserved gates, transport, and acknowledgements for the session pair.
+- **Team Card dual ACK:** `TEAM_CARD_DUAL_ACK`, requiring matching `acks.builder` and `acks.verifier` over the same card digest.
+- **Question ID:** stable `Q-nnn` identity for one canonical question mirrored to both sessions.
+- **Four-readback:** exact closure cells `builder.question`, `verifier.question`, `builder.answer`, and `verifier.answer`, all digest-matched.
+- **Critical closure:** recomputed open/closed set from station evidence, question/answer digests, and four-readback cells; never a narrated boolean.
+- **EvidenceRef:** closed physical binding `{path, bytes, sha256}` whose regular file is opened and recomputed; a marker or declaration is not evidence.
+- **Workspace access envelope:** per-activation `WORKSPACE_ACCESS_ENVELOPE` binding named roots, non-destructive grants/non-grants, locked session pair, physical preflight, and one bound `omni-workspace-access-probe-receipt-v1` proving create-once, non-overwrite, retention, and physical source readback.
+- **Access-ready:** `ACCESS_READY`, possible only in `REAL` after `ACCESS_GRANTED_NON_DESTRUCTIVE` and reproducible physical proof; PARTIAL, DENIED, and DRY_RUN cannot claim it.
+- **PM relay:** `PM_RELAY`, an ordered user-mediated byte transport that is not a governed channel, authority, consent, lease, write grant, or independent counter-signature.
+- **Guided regime:** `GUIDED_PM`, in which the PM authorizes or advances reserved transitions; it does not arm recurring automation unless `ARM_AUTOMATION` is separately granted.
+- **Autonomous regime:** `AUTONOMOUS`, selected only after the canonical program and explicit autonomy envelope exist; every effect, sentinel, budget, stop, and kill switch remains scoped, and `ARM_AUTOMATION` is separate.
+- **Intake proposal:** digest-bound L2 proposal requiring matching builder and verifier readback before `INTAKE_READY`.
+- **Fused program:** closed `omni-fused-program-v2` candidate with `PROGRAM_FUSION_FROZEN`, builder authorship, both frozen lanes, ordered work items, intake digest, origins, alternatives, dissent, and locked session-pair binding.
+- **Program countersign receipt:** separate physical `omni-program-countersign-receipt-v2` with `PROGRAM_COUNTERSIGN_ACCEPTED` + `ACCEPTED`, signed by the bound independent verifier over the same program bytes, intake, knowledge-fusion, and session-pair digests.
+- **Program digest:** exact SHA-256 and record digest of the closed fused realization program; Mode remains `MODE_BEFORE_PROGRAM` until the V2 countersign and the external sovereign `omni-program-baptism-decision-v1` plus `omni-program-baptism-receipt-v1` with `PROGRAM_BAPTIZED` are all byte-bound and reproduced. V1 artifacts fail closed.
+- **Declaration-only verification:** invalid acceptance based on labels, markers, or named files without opening and reproducing their physical bytes, hashes, schema, and cross-bindings.
+- **Adversarial solo independence:** `INDEPENDENCE=ADVERSARIAL_SOLO`, the weaker declared independence of one sovereign working through two separate native-session brains.
+- **Profile degraded:** `PROFILE_DEGRADED`, an explicit non-closing state when required session, brain, host, model, effort, tool, or sentinel parity is unavailable.
+- **F3 (Build):** construction of a candidate payload inside the authorized project scope; it grants no delivery authority.
+- **F4 (Test):** adversarial verification and repair of the F3 candidate; it grants no installation, publication, or external-effect authority.
+- **F5 (Delivery):** installation, publication, release, or another external effect; it is separately authorized and never inferred from F3/F4 PASS.
+- **Authority:** permission to perform a bounded class of actions; capability is not authority.
+- **Carrier:** host mechanism that creates, resumes, or forks a native session.
+- **Counter-signature:** independent verifier receipt bound to exact bytes and method.
+- **Create-once:** immutable artifact written only if the target did not already exist.
+- **Fence:** generation/token control that makes stale owners unable to act.
+- **Lease:** time/generation-bound right to write a named target.
+- **Make-before-break:** create and restore a distinct shadow successor before revoking the predecessor; it never permits two writers.
+- **Physical MAX:** greatest ordinal derived from actual channel filenames, not cached state.
+- **Profile parity:** equality of model, reasoning, permission, project, tools, objectives, and sentinels across a handoff.
+- **Surface profile:** frozen identity of one host UI/CLI/API surface plus model, effort, permissions, root, tools, goal, sentinels, and native session.
+- **Host-context sentinel:** non-authorizing check that compares measured context use with a known host denominator.
+- **Sentinel:** non-authorizing liveness/readiness observer.
+- **Supervisor uniqueness:** exactly one script-sentinel supervisor namespace and owner generation for a normalized project root; alternate state directories are not independent authority.
+- **Shadow:** successor allowed to read and restore but not write or hold the lease.
+- **Stele:** frozen project constitution amended only by a successor artifact.
+- **UI switch:** visible selection of a task; distinct from ownership transfer.
+- **Typed state:** state whose schema, preconditions, evidence, producer, failure codes, and validator are explicit.
+- **Well:** durable on-disk project memory organized by authority, state, plan, knowledge, evidence, and learning.

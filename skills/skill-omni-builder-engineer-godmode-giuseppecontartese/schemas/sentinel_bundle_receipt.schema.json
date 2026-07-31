@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:omni-builder:sentinel-bundle-receipt:1",
+  "title": "Omni-Builder L5 Physical Sentinel Bundle Receipt",
+  "description": "Typed PASS, BLOCK or INCONCLUSIVE readback for three separately physical sentinels. Sentinels grant no authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "status", "decision", "receipt_id", "task_id", "program_id",
+    "subject_session_id", "objective_binding", "arm_authority_binding",
+    "sentinels", "all_physical", "rehydration_complete", "grants_authority",
+    "finding_codes", "observed_at", "expires_at", "created_at", "record_digest"
+  ],
+  "properties": {
+    "schema": {"const": "omni-sentinel-bundle-receipt-v1"},
+    "status": {"enum": ["SENTINEL_BUNDLE_PASS", "SENTINEL_BUNDLE_BLOCKED", "SENTINEL_BUNDLE_INCONCLUSIVE"]},
+    "decision": {"enum": ["PASS", "BLOCK", "INCONCLUSIVE"]},
+    "receipt_id": {"$ref": "#/$defs/identifier"},
+    "task_id": {"$ref": "#/$defs/identifier"},
+    "program_id": {"$ref": "#/$defs/identifier"},
+    "subject_session_id": {"type": "string", "minLength": 1, "maxLength": 256},
+    "objective_binding": {"$ref": "#/$defs/file_binding"},
+    "arm_authority_binding": {"$ref": "#/$defs/file_binding"},
+    "sentinels": {
+      "type": "object", "additionalProperties": false,
+      "required": ["agentic", "script", "context"],
+      "properties": {
+        "agentic": {"$ref": "#/$defs/sentinel"},
+        "script": {"$ref": "#/$defs/sentinel"},
+        "context": {"$ref": "#/$defs/sentinel"}
+      }
+    },
+    "all_physical": {"type": "boolean"},
+    "rehydration_complete": {"type": "boolean"},
+    "grants_authority": {"const": false},
+    "finding_codes": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/identifier"}},
+    "observed_at": {"type": "string", "format": "date-time"},
+    "expires_at": {"type": "string", "format": "date-time"},
+    "created_at": {"type": "string", "format": "date-time"},
+    "record_digest": {"$ref": "#/$defs/sha256"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"decision": {"const": "PASS"}}, "required": ["decision"]},
+      "then": {"properties": {"status": {"const": "SENTINEL_BUNDLE_PASS"}, "all_physical": {"const": true}, "rehydration_complete": {"const": true}, "finding_codes": {"const": []}}}
+    },
+    {
+      "if": {"properties": {"decision": {"const": "BLOCK"}}, "required": ["decision"]},
+      "then": {"properties": {"status": {"const": "SENTINEL_BUNDLE_BLOCKED"}, "finding_codes": {"minItems": 1}}}
+    },
+    {
+      "if": {"properties": {"decision": {"const": "INCONCLUSIVE"}}, "required": ["decision"]},
+      "then": {"properties": {"status": {"const": "SENTINEL_BUNDLE_INCONCLUSIVE"}, "finding_codes": {"minItems": 1}}}
+    }
+  ],
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "identifier": {"type": "string", "pattern": "^[A-Z0-9][A-Z0-9._-]{0,127}$"},
+    "absolute_path": {"type": "string", "minLength": 3, "anyOf": [{"pattern": "^[A-Za-z]:[\\\\/].+"}, {"pattern": "^(?:\\\\\\\\|//)[^\\\\/]+[\\\\/][^\\\\/]+(?:[\\\\/].*)?$"}, {"pattern": "^/.*"}]},
+    "file_binding": {"type": "object", "additionalProperties": false, "required": ["path", "bytes", "sha256"], "properties": {"path": {"$ref": "#/$defs/absolute_path"}, "bytes": {"type": "integer", "minimum": 1}, "sha256": {"$ref": "#/$defs/sha256"}}},
+    "sentinel": {
+      "type": "object", "additionalProperties": false,
+      "required": ["kind", "sentinel_id", "namespace", "generation", "owner_session_id", "state", "heartbeat_seq", "observed_at", "expires_at", "physical_receipt_binding", "arm_authority_binding", "rehydrated", "grants_authority"],
+      "properties": {
+        "kind": {"enum": ["AGENTIC", "SCRIPT", "CONTEXT"]},
+        "sentinel_id": {"$ref": "#/$defs/identifier"},
+        "namespace": {"$ref": "#/$defs/identifier"},
+        "generation": {"type": "integer", "minimum": 1},
+        "owner_session_id": {"type": "string", "minLength": 1, "maxLength": 256},
+        "state": {"enum": ["ARMED", "CHILD_RUNNING", "HEALTHY", "HANDOFF_FREEZE_REQUIRED", "NOT_READY", "UNKNOWN"]},
+        "heartbeat_seq": {"type": "integer", "minimum": 1},
+        "observed_at": {"type": "string", "format": "date-time"},
+        "expires_at": {"type": "string", "format": "date-time"},
+        "physical_receipt_binding": {"$ref": "#/$defs/file_binding"},
+        "arm_authority_binding": {"$ref": "#/$defs/file_binding"},
+        "rehydrated": {"type": "boolean"},
+        "grants_authority": {"const": false}
+      }
+    }
+  }
+}

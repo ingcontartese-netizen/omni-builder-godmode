@@ -1,0 +1,7 @@
+{
+  "schema": "omni-incident-fixture-v1",
+  "id": "PB-022-023-ROTATION-MISSING-RESUME",
+  "control": "rotation_chain",
+  "input": {"states": ["ROTATION_REQUESTED", "HANDOFF_FROZEN", "SUCCESSOR_CREATED", "SESSION_BOUND", "ATTACH_PASS", "RESTORE_PASS"]},
+  "expected": {"terminal_pass": false, "missing": ["RESUME_PASS", "WORK_ACKED", "WORK_STARTED_PROBE", "WORK_RESUMED_NOTIFIED", "PEER_COUNTERSIGN", "SUBSTANTIVE_WORK_RELEASED"]}
+}

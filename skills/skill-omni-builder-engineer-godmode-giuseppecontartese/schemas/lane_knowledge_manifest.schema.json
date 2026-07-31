@@ -1,0 +1,412 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:omni-builder:lane-knowledge-manifest:1",
+  "title": "Omni-Builder Frozen Lane Knowledge Manifest",
+  "description": "Create-once freeze record for one independent lane after material binding, mandatory light web mapping, frozen deep plan, deep research with new sources, and a provenance-complete dossier. It proves no fusion, plan, or execution authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "status",
+    "pipeline_id",
+    "task_id",
+    "session_pair_sha256",
+    "role",
+    "session_id",
+    "lane_root",
+    "material_join_binding",
+    "light_map_binding",
+    "deep_plan_binding",
+    "deep_research_receipt_binding",
+    "deep_dossier_binding",
+    "source_manifest_binding",
+    "acquisitions",
+    "web_research_required",
+    "cross_read_performed",
+    "deep_new_source_ids",
+    "findings",
+    "conflicts",
+    "dissent",
+    "provenance",
+    "received_not_used",
+    "limits",
+    "created_at",
+    "record_digest"
+  ],
+  "properties": {
+    "schema": {
+      "const": "omni-lane-knowledge-manifest-v1"
+    },
+    "status": {
+      "const": "LANE_FROZEN"
+    },
+    "pipeline_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "task_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "session_pair_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "role": {
+      "enum": [
+        "BUILDER",
+        "VERIFIER"
+      ]
+    },
+    "session_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "lane_root": {
+      "$ref": "#/$defs/absolute_path"
+    },
+    "material_join_binding": {
+      "$ref": "#/$defs/file_binding"
+    },
+    "light_map_binding": {
+      "$ref": "#/$defs/file_binding"
+    },
+    "deep_plan_binding": {
+      "$ref": "#/$defs/file_binding"
+    },
+    "deep_research_receipt_binding": {
+      "$ref": "#/$defs/file_binding"
+    },
+    "deep_dossier_binding": {
+      "$ref": "#/$defs/file_binding"
+    },
+    "source_manifest_binding": {
+      "$ref": "#/$defs/file_binding"
+    },
+    "acquisitions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/file_binding"
+      },
+      "uniqueItems": true
+    },
+    "web_research_required": {
+      "const": true
+    },
+    "cross_read_performed": {
+      "const": false
+    },
+    "deep_new_source_ids": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/identifier"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/finding"
+      },
+      "minItems": 1
+    },
+    "conflicts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/conflict"
+      }
+    },
+    "dissent": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/dissent"
+      }
+    },
+    "provenance": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/provenance"
+      },
+      "minItems": 1
+    },
+    "received_not_used": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/received_not_used"
+      }
+    },
+    "limits": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "record_digest": {
+      "$ref": "#/$defs/sha256"
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[A-F0-9]{64}$"
+    },
+    "identifier": {
+      "type": "string",
+      "pattern": "^[A-Z0-9][A-Z0-9._-]{0,127}$"
+    },
+    "absolute_path": {
+      "type": "string",
+      "minLength": 3,
+      "anyOf": [
+        {
+          "pattern": "^[A-Za-z]:[\\\\/].+"
+        },
+        {
+          "pattern": "^(?:\\\\\\\\|//)[^\\\\/]+[\\\\/][^\\\\/]+(?:[\\\\/].*)?$"
+        },
+        {
+          "pattern": "^/.*"
+        }
+      ]
+    },
+    "file_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "bytes",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/absolute_path"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "finding_id",
+        "statement",
+        "source_ids",
+        "confidence",
+        "freshness"
+      ],
+      "properties": {
+        "finding_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "statement": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/identifier"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "confidence": {
+          "enum": [
+            "HIGH",
+            "MEDIUM",
+            "LOW",
+            "UNKNOWN"
+          ]
+        },
+        "freshness": {
+          "enum": [
+            "CURRENT_PRIMARY",
+            "CURRENT_SECONDARY",
+            "HISTORICAL",
+            "UNKNOWN"
+          ]
+        }
+      }
+    },
+    "conflict": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "conflict_id",
+        "source_ids",
+        "statement",
+        "status",
+        "analysis"
+      ],
+      "properties": {
+        "conflict_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "source_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/identifier"
+          },
+          "minItems": 2,
+          "uniqueItems": true
+        },
+        "statement": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": [
+            "RESOLVED",
+            "UNRESOLVED_NONBLOCKING",
+            "BLOCKING"
+          ]
+        },
+        "analysis": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "dissent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "dissent_id",
+        "statement",
+        "source_ids",
+        "status",
+        "rationale"
+      ],
+      "properties": {
+        "dissent_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "statement": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/identifier"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "status": {
+          "enum": [
+            "OPEN",
+            "PRESERVED_NONBLOCKING",
+            "ESCALATED_BLOCKING"
+          ]
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provenance_id",
+        "sources_actually_read",
+        "version_hash_access_date",
+        "sections_consulted",
+        "received_material_not_used",
+        "facts_extracted",
+        "model_synthesis_or_inference",
+        "conflicts_gaps_and_limits"
+      ],
+      "properties": {
+        "provenance_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "sources_actually_read": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/identifier"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "version_hash_access_date": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "sections_consulted": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "received_material_not_used": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/identifier"
+          },
+          "uniqueItems": true
+        },
+        "facts_extracted": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "model_synthesis_or_inference": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "conflicts_gaps_and_limits": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "received_not_used": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "item_id",
+        "reason_code",
+        "rationale"
+      ],
+      "properties": {
+        "item_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "reason_code": {
+          "$ref": "#/$defs/identifier"
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

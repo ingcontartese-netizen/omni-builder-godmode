@@ -1,0 +1,53 @@
+# STELE ZERO — OMNI_FULL ONLY
+
+`applicability=OMNI_FULL_ONLY`; `activation_level=OMNI_FULL`; `MODULE_INSTANTIATION_FORBIDDEN`. This template contains Q0, guided intake, fused program, and Mode fields and must never instantiate for `OMNI_AWARE` or `OMNI_MODULE`; a module uses its separate mini-contract and typed outcome.
+
+- Activation receipt path / bytes / SHA-256 / `ACTIVATION_ALLOWED` decision / exact six non-grants:
+- Activation trace: `knowledge_available` / `skill_invoked` / activation level / real packaged modules / authority grants / artifact grants / `requested_effects` / `effect_authorized` / effect grants / non-grants / access-envelope ID / next gate / no-silent-upgrade proof:
+- `KNOWLEDGE_AVAILABLE != SKILL_INVOKED != EFFECT_AUTHORIZED`:
+- Guided-intake state path / bytes / SHA-256 / record digest / `INTAKE_READY`:
+- Topology: `SOLO_DUAL_HAT` or `TEAM_DUAL_LANE`
+- PM topology-selection relay / payload path / bytes / SHA-256 / authorization:
+- TEAM_CARD path / bytes / SHA-256 / status (`TEAM_CARD_DUAL_ACK` required):
+- Session pair ID / SHA-256 / `LOCKED_UNTIL_CUTOVER`:
+- Builder session / verifier session (native and distinct):
+- Builder brain / verifier brain (separate):
+- Builder mandate / verifier mandate paths, bytes, and SHA-256:
+- Builder write lane / verifier write lane / no-cross-write:
+- Message lane: `PM_RELAY` (`governed_channel_equivalent: false`):
+- Relay ledger path / bytes / SHA-256 / last `RELAY-nnn` and payload SHA-256:
+- `WORKSPACE_ACCESS_ENVELOPE` canonical `binding` (path / bytes / SHA-256) + standalone schema-valid `artifact` / record digest / canonical roots / locked session pair:
+- `ACCESS_GRANTED_NON_DESTRUCTIVE` + `ACCESS_READY` and exact four [414] grants:
+- Exact eight non-grants / network separate / download separate:
+- Physical preflight and bound `omni-workspace-access-probe-receipt-v1` canonical `binding` (path / bytes / SHA-256) + standalone schema-valid `artifact` / record digest:
+- Probe `CREATE_ONCE_PROBE_RETAINED` / exact root and session bindings / exact four capabilities / `create_once=true` / `overwritten=false` / `retained=true` / physical read proofs:
+- Path canonicality proof: `CANONICAL_ABSOLUTE_PATH_REQUIRED`; `REJECT_CWD_RELATIVE` / `REJECT_DRIVE_RELATIVE` / `REJECT_NTFS_ADS` / `REJECT_DEVICE_ALIAS`; `NUL_FAMILY_NOT_MODULE_SURFACE`:
+- Mirrored `QUESTION_ID` and four-readback closure:
+- Open critical question IDs and critical-evidence gaps (both derived and empty before intake closure):
+- Objective and machine-observable finish:
+- Sovereign and authority source:
+- Scope and non-objectives:
+- Frozen inputs with bytes and SHA-256:
+- One well root; separate builder/verifier brains and non-overlapping lane roots:
+- Shared research brief and material-join manifest, both byte-bound to the locked session pair:
+- User material and mandatory independent web-research lanes (material never replaces web):
+- Knowledge-effect authority: `NETWORK_RESEARCH` separately granted; `DOWNLOAD` separately granted or `CAPTURE_MD_ONLY`:
+- Lane sequence: material bound / light-map freeze / deep-plan freeze / deep research / dossier / `LANE_FROZEN`:
+- Official governed channel path and physical MAX; PM relay is not equivalent:
+- No-oracle-contamination evidence before both lane freezes:
+- PM `KNOWLEDGE_FUSION` gate / builder fusion / distinct-verifier countersign / `KNOWLEDGE_FUSION_PASS`:
+- Fusion preserves provenance, conflicts, dissent, exclusions, gaps, confidence, and freshness:
+- No canonical WBS/DAG or realization plan before `KNOWLEDGE_FUSION_PASS`:
+- Intake proposal path / bytes / SHA-256 / dual readback:
+- WBS/DAG and critical path:
+- Writer, verifier, and evidence lanes:
+- Budgets, kill switch, and rollback:
+- Acceptance matrix and negative tests:
+- Persistent objective and sentinels:
+- Rotation/profile plan:
+- Fused program schema `omni-fused-program-v2` / canonical `binding` + standalone schema-valid `artifact` / `PROGRAM_FUSION_FROZEN` candidate / ID / author, topology, profile, run-kind, lane origins, complete work-item contract, knowledge, and session-pair fields:
+- Independent program countersign `omni-program-countersign-receipt-v2` canonical `binding` + standalone schema-valid `artifact` / `PROGRAM_COUNTERSIGN_ACCEPTED` / `ACCEPTED` / receipt, exact program binding, verifier signer, reproduction matrix, knowledge, and session-pair fields:
+- Sovereign `omni-program-baptism-decision-v1` plus `omni-program-baptism-receipt-v1` / exact byte bindings / `PROGRAM_BAPTIZED`:
+- Mode, autonomy, and risk (select only after physical access, verified intake, `KNOWLEDGE_FUSION_PASS`, frozen fused-program candidate, independent countersign receipt, and sovereign baptism receipt are bound):
+- `GUIDED_PM` reserves transitions to the PM; `AUTONOMOUS` requires explicit autonomy authority plus separate `ARM_AUTOMATION`, sentinel, budget, stop, and kill-switch bindings:
+- Final gate: `READY_FOR_GIUSEPPE_PRE_INSTALL_TESTS`

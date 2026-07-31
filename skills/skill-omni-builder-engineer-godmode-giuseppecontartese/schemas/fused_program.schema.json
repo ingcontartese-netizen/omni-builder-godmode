@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:omni-builder:fused-program:2",
+  "title": "Omni-Builder Frozen Fused Realization Program V2",
+  "description": "Builder-authored create-once fusion of two frozen plan lanes. It remains a candidate until independent countersign and PM PROGRAM_BAPTISM.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "kind", "status", "program_id", "task_id", "knowledge_pipeline_id",
+    "knowledge_state_binding", "knowledge_fusion_countersign_binding",
+    "canonical_knowledge_binding", "session_pair_sha256", "author_role",
+    "author_session_id", "topology", "profile", "run_kind", "fused_from_lanes",
+    "builder_plan_manifest_binding", "verifier_plan_manifest_binding",
+    "fusion_decision_register_binding", "fused_plan_draft_binding", "work_items",
+    "preserved_alternative_ids", "preserved_dissent_ids", "created_at", "record_digest"
+  ],
+  "properties": {
+    "schema": {"const": "omni-fused-program-v2"},
+    "kind": {"const": "PROGRAM_FUSION_CANDIDATE"},
+    "status": {"const": "PROGRAM_FUSION_FROZEN"},
+    "program_id": {"$ref": "#/$defs/identifier"},
+    "task_id": {"$ref": "#/$defs/identifier"},
+    "knowledge_pipeline_id": {"$ref": "#/$defs/identifier"},
+    "knowledge_state_binding": {"$ref": "#/$defs/file_binding"},
+    "knowledge_fusion_countersign_binding": {"$ref": "#/$defs/file_binding"},
+    "canonical_knowledge_binding": {"$ref": "#/$defs/file_binding"},
+    "session_pair_sha256": {"$ref": "#/$defs/sha256"},
+    "author_role": {"const": "BUILDER"},
+    "author_session_id": {"type": "string", "minLength": 1, "maxLength": 256},
+    "topology": {"enum": ["TEAM_DUAL_LANE", "SOLO_DUAL_HAT"]},
+    "profile": {"const": "GODMODE"},
+    "run_kind": {"enum": ["REAL", "DRY_RUN"]},
+    "fused_from_lanes": {"const": ["BUILDER", "VERIFIER"]},
+    "builder_plan_manifest_binding": {"$ref": "#/$defs/file_binding"},
+    "verifier_plan_manifest_binding": {"$ref": "#/$defs/file_binding"},
+    "fusion_decision_register_binding": {"$ref": "#/$defs/file_binding"},
+    "fused_plan_draft_binding": {"$ref": "#/$defs/file_binding"},
+    "work_items": {"type": "array", "minItems": 1, "maxItems": 64, "items": {"$ref": "#/$defs/work_item"}},
+    "preserved_alternative_ids": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/identifier"}},
+    "preserved_dissent_ids": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/identifier"}},
+    "created_at": {"type": "string", "format": "date-time"},
+    "record_digest": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "identifier": {"type": "string", "pattern": "^[A-Z0-9][A-Z0-9._-]{0,127}$"},
+    "absolute_path": {
+      "type": "string", "minLength": 3,
+      "anyOf": [
+        {"pattern": "^[A-Za-z]:[\\\\/].+"},
+        {"pattern": "^(?:\\\\\\\\|//)[^\\\\/]+[\\\\/][^\\\\/]+(?:[\\\\/].*)?$"},
+        {"pattern": "^/.*"}
+      ]
+    },
+    "file_binding": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "bytes", "sha256"],
+      "properties": {"path": {"$ref": "#/$defs/absolute_path"}, "bytes": {"type": "integer", "minimum": 1}, "sha256": {"$ref": "#/$defs/sha256"}}
+    },
+    "artifact": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "create_policy", "owner_role"],
+      "properties": {
+        "path": {"$ref": "#/$defs/absolute_path"},
+        "create_policy": {"enum": ["CREATE_ONCE", "MUTABLE_OWNED", "SUPERSEDE_CREATE_ONCE"]},
+        "owner_role": {"enum": ["BUILDER", "VERIFIER"]}
+      }
+    },
+    "budget": {
+      "type": "object", "additionalProperties": false,
+      "required": ["max_turns", "max_tool_calls", "max_elapsed_seconds"],
+      "properties": {
+        "max_turns": {"type": "integer", "minimum": 1, "maximum": 10000},
+        "max_tool_calls": {"type": "integer", "minimum": 0, "maximum": 100000},
+        "max_elapsed_seconds": {"type": "integer", "minimum": 1, "maximum": 31536000}
+      }
+    },
+    "acceptance_evidence": {
+      "type": "object", "additionalProperties": false,
+      "required": ["evidence_id", "description", "kind"],
+      "properties": {
+        "evidence_id": {"$ref": "#/$defs/identifier"},
+        "description": {"type": "string", "minLength": 1},
+        "kind": {"enum": ["FILE_BINDING", "RECEIPT", "TEST_REPORT", "CHANNEL_RECORD", "REPRODUCTION_LOG"]}
+      }
+    },
+    "rollback": {
+      "type": "object", "additionalProperties": false,
+      "required": ["strategy", "steps"],
+      "properties": {
+        "strategy": {"enum": ["REVERT_CANDIDATE", "SUPERSEDE_CREATE_ONCE", "SAFE_PARK", "NOT_APPLICABLE"]},
+        "steps": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "origin_ref": {
+      "type": "object", "additionalProperties": false,
+      "required": ["role", "work_id"],
+      "properties": {
+        "role": {"enum": ["BUILDER", "VERIFIER"]},
+        "work_id": {"$ref": "#/$defs/identifier"}
+      }
+    },
+    "work_item": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "work_id", "ordinal", "title", "result", "persistent_artifact", "owner_role",
+        "depends_on", "preconditions", "required_capabilities", "budget",
+        "acceptance_evidence", "verifier_role", "rollback", "failure_states",
+        "next_gate", "scope", "origin_refs"
+      ],
+      "properties": {
+        "work_id": {"$ref": "#/$defs/identifier"},
+        "ordinal": {"type": "integer", "minimum": 1, "maximum": 64},
+        "title": {"type": "string", "minLength": 1},
+        "result": {"type": "string", "minLength": 1},
+        "persistent_artifact": {"$ref": "#/$defs/artifact"},
+        "owner_role": {"enum": ["BUILDER", "VERIFIER"]},
+        "depends_on": {"type": "array", "maxItems": 16, "uniqueItems": true, "items": {"$ref": "#/$defs/identifier"}},
+        "preconditions": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "required_capabilities": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/identifier"}},
+        "budget": {"$ref": "#/$defs/budget"},
+        "acceptance_evidence": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/acceptance_evidence"}},
+        "verifier_role": {"enum": ["BUILDER", "VERIFIER"]},
+        "rollback": {"$ref": "#/$defs/rollback"},
+        "failure_states": {
+          "type": "array", "minItems": 1, "uniqueItems": true,
+          "items": {"enum": ["BLOCKED_PENDING_HUMAN", "BLOCKED_PENDING_INFRA", "INCONCLUSIVE", "ABORTED", "SUPERSEDED"]}
+        },
+        "next_gate": {"$ref": "#/$defs/identifier"},
+        "scope": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["F3_BUILD", "F4_TEST"]}},
+        "origin_refs": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/origin_ref"}}
+      }
+    }
+  }
+}

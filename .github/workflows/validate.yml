@@ -1,0 +1,40 @@
+name: validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+defaults:
+  run:
+    working-directory: skills/skill-omni-builder-engineer-godmode-giuseppecontartese
+
+jobs:
+  validate-skill:
+    name: Full validation (Windows, Python 3.14)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: Install validation dependencies
+        run: pip install -r requirements.txt
+
+      - name: Package validator (structure, schemas, doctrine pins)
+        run: python -B scripts/validate_skill.py . --no-tests
+
+      - name: Full test suite (226 tests)
+        run: python -B -m unittest discover -s tests -p "test_*.py"
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+
+      - name: No bytecode pollution after run
+        shell: pwsh
+        run: |
+          $pyc = Get-ChildItem -Recurse -Include *.pyc -Force -ErrorAction SilentlyContinue
+          if ($pyc) { Write-Error "Bytecode artifacts found: $($pyc.Count)"; exit 1 }
+          Write-Output "Clean: zero bytecode artifacts"

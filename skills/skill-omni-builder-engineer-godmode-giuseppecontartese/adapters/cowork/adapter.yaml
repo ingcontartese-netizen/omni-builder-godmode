@@ -1,0 +1,32 @@
+schema: omni-host-adapter-v1
+host: anthropic-cowork
+host_version: "Claude Desktop 1.24012.9.0; Cowork surface unqualified"
+surface_id: claude-cowork-desktop
+accessed: 2026-07-30
+official_sources: []
+capability_layers:
+  session_carrier:
+    documented: []
+    observed: [desktop_conversation]
+    authorized: []
+    live_proven: []
+  host_supervisor:
+    documented: []
+    observed: []
+    authorized: []
+    live_proven: []
+  ui_navigation:
+    documented: []
+    observed: [desktop_chat_selection]
+    authorized: []
+    live_proven: []
+profile:
+  fields: [surface_id, model, effort_or_mode, permission_surface, project_root, conversation_id, tool_inventory, objective, agentic_sentinel, script_sentinel, context_sentinel]
+  rule: unknown_fields_make_profile_degraded
+rotation:
+  carrier: UNQUALIFIED_UNTIL_HOST_PROBE
+  self_spawn: forbidden
+  state_chain: [ROTATION_REQUESTED, HANDOFF_FROZEN, SUCCESSOR_CREATED, SESSION_BOUND, ATTACH_PASS, RESTORE_PASS, AUTHORITY_ENVELOPE_BOUND, VISIBLE_SESSION_SELECTED, PREDECESSOR_FENCE_STARTED, PREDECESSOR_AUTHORITY_REVOKED, PREDECESSOR_QUIESCENT, LEASE_GRANTED, RESUME_PASS, WORK_ACKED, WORK_STARTED_PROBE, WORK_RESUMED_NOTIFIED, PEER_COUNTERSIGN, SUBSTANTIVE_WORK_RELEASED]
+notes:
+  - Do not inherit Claude Code carrier claims into Cowork.
+  - Prefer disk handoff and a human or qualified external carrier until proved.

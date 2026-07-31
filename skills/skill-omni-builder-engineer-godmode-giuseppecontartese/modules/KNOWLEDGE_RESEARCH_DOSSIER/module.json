@@ -1,0 +1,57 @@
+{
+  "schema": "omni-module-manifest-v1",
+  "module_id": "KNOWLEDGE_RESEARCH_DOSSIER",
+  "version": "1.0.0",
+  "activation_level": "OMNI_MODULE",
+  "entrypoint": "run.py",
+  "summary": "Named material and topic to a two-stage web-researched provenance Markdown dossier, then a typed stop.",
+  "inputs": {
+    "topic": "NONEMPTY_STRING",
+    "named_material_files": "ONE_OR_MORE_EXACT_FILE_BINDINGS"
+  },
+  "authorities": {
+    "activation_grants_effects": false,
+    "separate_records": true,
+    "required": [
+      "READ_NAMED_SOURCES",
+      "CREATE_FILES",
+      "NETWORK_RESEARCH"
+    ],
+    "optional": [
+      "DOWNLOAD"
+    ]
+  },
+  "stages": [
+    "MATERIAL_STUDY",
+    "LIGHT_WEB_MAP",
+    "DEEP_WEB_RESEARCH",
+    "PROVENANCE_DOSSIER"
+  ],
+  "outputs": [
+    "MATERIAL_STUDY.json",
+    "LIGHT_MAP.json",
+    "DEEP_RESEARCH_RECEIPT.json",
+    "SOURCE_MANIFEST.json",
+    "DOSSIER.md",
+    "MODULE_OUTCOME.json"
+  ],
+  "network_policy": {
+    "runtime_opens_network": false,
+    "host_tool_required": true,
+    "default_capture_policy": "CAPTURE_MD_ONLY",
+    "download_fallback": "DOWNLOAD_NOT_AUTHORIZED_CAPTURE_MD_ONLY",
+    "download_handling": "QUARANTINE_HASH_NEVER_EXECUTE"
+  },
+  "terminal": {
+    "status": "KNOWLEDGE_RESEARCH_DOSSIER_READY",
+    "next_gate": "STOP"
+  },
+  "scope": {
+    "ordinary_request_autorun": false,
+    "opens_intake": false,
+    "opens_project_state": false,
+    "opens_multi_agent_topology": false,
+    "selects_execution_mode": false,
+    "continues_after_terminal_outcome": false
+  }
+}

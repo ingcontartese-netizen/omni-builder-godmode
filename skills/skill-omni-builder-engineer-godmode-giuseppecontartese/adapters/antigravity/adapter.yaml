@@ -1,0 +1,35 @@
+schema: omni-host-adapter-v1
+host: google-antigravity
+host_version: "agy 1.0.1"
+surface_id: antigravity-cli
+accessed: 2026-07-30
+official_sources: [https://codelabs.developers.google.com/getting-started-with-antigravity-skills, https://codelabs.developers.google.com/getting-started-agy-ide]
+capability_layers:
+  session_carrier:
+    documented: []
+    observed: []
+    authorized: []
+    live_proven: []
+  host_supervisor:
+    documented: []
+    observed: []
+    authorized: []
+    live_proven: []
+  ui_navigation:
+    documented: []
+    observed: []
+    authorized: []
+    live_proven: []
+profile:
+  fields: [surface_id, model, mode, permission_policy, workspace, agent_id, conversation_id, goal, schedule, tool_inventory, agentic_sentinel, script_sentinel, context_sentinel]
+  rule: bind_agent_conversation_and_checkout_separately
+rotation:
+  carrier: DOCUMENTED_NOT_LIVE_PROVEN
+  self_spawn: forbidden
+  state_chain: [ROTATION_REQUESTED, HANDOFF_FROZEN, SUCCESSOR_CREATED, SESSION_BOUND, ATTACH_PASS, RESTORE_PASS, AUTHORITY_ENVELOPE_BOUND, VISIBLE_SESSION_SELECTED, PREDECESSOR_FENCE_STARTED, PREDECESSOR_AUTHORITY_REVOKED, PREDECESSOR_QUIESCENT, LEASE_GRANTED, RESUME_PASS, WORK_ACKED, WORK_STARTED_PROBE, WORK_RESUMED_NOTIFIED, PEER_COUNTERSIGN, SUBSTANTIVE_WORK_RELEASED]
+notes:
+  - Official skill packaging is documented for ~/.gemini/config/skills and project .agents/skills; Antigravity CLI path variants require host-specific readback before installation.
+  - Skill packaging documentation proves discovery locations only, not session rotation, agent switching, or lease transfer.
+  - The observed host_version proves only binary presence and version, not a carrier verb.
+  - Conversation fork does not isolate the Git checkout and is not ownership transfer.
+  - Agent switching, carrier creation, UI selection, and lease transfer require separate evidence.

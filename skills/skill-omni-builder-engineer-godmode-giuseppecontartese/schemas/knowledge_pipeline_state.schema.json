@@ -1,0 +1,838 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:omni-builder:knowledge-pipeline-state:1",
+  "title": "Omni-Builder Knowledge Pipeline State",
+  "description": "Hash-chained global L3 state with two independently owned lane state machines. It terminates at KNOWLEDGE_FUSION_PASS and carries no realization-program or project-execution authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "state_id",
+    "pipeline_id",
+    "generation",
+    "phase",
+    "status",
+    "task_id",
+    "project_root",
+    "well_root",
+    "intake_binding",
+    "session_pair_sha256",
+    "session_pair",
+    "access_envelopes",
+    "source_roots",
+    "material",
+    "lanes",
+    "fusion",
+    "event",
+    "actor",
+    "effect_authority_binding",
+    "evidence_bindings",
+    "blocking_reason_codes",
+    "previous_state_binding",
+    "created_at",
+    "record_digest"
+  ],
+  "properties": {
+    "schema": {
+      "const": "omni-knowledge-pipeline-state-v1"
+    },
+    "state_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "pipeline_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "generation": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "phase": {
+      "enum": [
+        "WELL_BOOTSTRAPPING",
+        "WELL_READY",
+        "MATERIAL_QUARANTINE",
+        "MATERIAL_JOINED",
+        "LANES_ACTIVE",
+        "LANES_FROZEN",
+        "FUSION_EMITTED",
+        "KNOWLEDGE_FUSION_PASS"
+      ]
+    },
+    "status": {
+      "enum": [
+        "ACTIVE",
+        "PASS"
+      ]
+    },
+    "task_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "project_root": {
+      "$ref": "#/$defs/absolute_path"
+    },
+    "well_root": {
+      "$ref": "#/$defs/absolute_path"
+    },
+    "intake_binding": {
+      "$ref": "#/$defs/file_binding"
+    },
+    "session_pair_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "session_pair": {
+      "$ref": "#/$defs/session_pair"
+    },
+    "access_envelopes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "BUILDER",
+        "VERIFIER"
+      ],
+      "properties": {
+        "BUILDER": {
+          "$ref": "#/$defs/file_binding"
+        },
+        "VERIFIER": {
+          "$ref": "#/$defs/file_binding"
+        }
+      }
+    },
+    "source_roots": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/absolute_path"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "material": {
+      "$ref": "#/$defs/material_state"
+    },
+    "lanes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "BUILDER",
+        "VERIFIER"
+      ],
+      "properties": {
+        "BUILDER": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/lane_state"
+            },
+            {
+              "properties": {
+                "role": {
+                  "const": "BUILDER"
+                }
+              }
+            }
+          ]
+        },
+        "VERIFIER": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/lane_state"
+            },
+            {
+              "properties": {
+                "role": {
+                  "const": "VERIFIER"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "fusion": {
+      "$ref": "#/$defs/fusion_state"
+    },
+    "event": {
+      "enum": [
+        "INIT",
+        "BOOTSTRAP_WELL",
+        "QUARANTINE_MATERIAL",
+        "JOIN_MATERIAL",
+        "BIND_LIGHT_MAP",
+        "FREEZE_DEEP_PLAN",
+        "START_DEEP_RESEARCH",
+        "BIND_DEEP_DOSSIER",
+        "FREEZE_LANE",
+        "EMIT_FUSION",
+        "COUNTERSIGN_FUSION"
+      ]
+    },
+    "actor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "role",
+        "session_id"
+      ],
+      "properties": {
+        "role": {
+          "enum": [
+            "BUILDER",
+            "VERIFIER"
+          ]
+        },
+        "session_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      }
+    },
+    "effect_authority_binding": {
+      "$ref": "#/$defs/file_binding"
+    },
+    "evidence_bindings": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/file_binding"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "blocking_reason_codes": {
+      "const": []
+    },
+    "previous_state_binding": {
+      "$ref": "#/$defs/nullable_file_binding"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "record_digest": {
+      "$ref": "#/$defs/sha256"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "phase": {
+            "const": "KNOWLEDGE_FUSION_PASS"
+          }
+        },
+        "required": [
+          "phase"
+        ]
+      },
+      "then": {
+        "properties": {
+          "status": {
+            "const": "PASS"
+          },
+          "fusion": {
+            "properties": {
+              "state": {
+                "const": "KNOWLEDGE_FUSION_PASS"
+              },
+              "candidate_binding": {
+                "$ref": "#/$defs/file_binding"
+              },
+              "canonical_binding": {
+                "$ref": "#/$defs/file_binding"
+              },
+              "countersign_binding": {
+                "$ref": "#/$defs/file_binding"
+              }
+            }
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "status": {
+            "const": "ACTIVE"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "phase": {
+            "const": "WELL_BOOTSTRAPPING"
+          }
+        },
+        "required": [
+          "phase"
+        ]
+      },
+      "then": {
+        "properties": {
+          "generation": {
+            "const": 1
+          },
+          "material": {
+            "properties": {
+              "state": {
+                "const": "NOT_STARTED"
+              },
+              "manifest_binding": {
+                "type": "null"
+              }
+            }
+          },
+          "previous_state_binding": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "phase": {
+            "const": "MATERIAL_QUARANTINE"
+          }
+        },
+        "required": [
+          "phase"
+        ]
+      },
+      "then": {
+        "properties": {
+          "material": {
+            "properties": {
+              "state": {
+                "const": "MATERIAL_QUARANTINE"
+              },
+              "manifest_binding": {
+                "$ref": "#/$defs/file_binding"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "phase": {
+            "enum": [
+              "MATERIAL_JOINED",
+              "LANES_ACTIVE",
+              "LANES_FROZEN",
+              "FUSION_EMITTED",
+              "KNOWLEDGE_FUSION_PASS"
+            ]
+          }
+        },
+        "required": [
+          "phase"
+        ]
+      },
+      "then": {
+        "properties": {
+          "material": {
+            "properties": {
+              "state": {
+                "const": "MATERIAL_JOINED"
+              },
+              "manifest_binding": {
+                "$ref": "#/$defs/file_binding"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "phase": {
+            "enum": [
+              "LANES_FROZEN",
+              "FUSION_EMITTED",
+              "KNOWLEDGE_FUSION_PASS"
+            ]
+          }
+        },
+        "required": [
+          "phase"
+        ]
+      },
+      "then": {
+        "properties": {
+          "lanes": {
+            "properties": {
+              "BUILDER": {
+                "properties": {
+                  "state": {
+                    "const": "LANE_FROZEN"
+                  },
+                  "manifest_binding": {
+                    "$ref": "#/$defs/file_binding"
+                  }
+                }
+              },
+              "VERIFIER": {
+                "properties": {
+                  "state": {
+                    "const": "LANE_FROZEN"
+                  },
+                  "manifest_binding": {
+                    "$ref": "#/$defs/file_binding"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "phase": {
+            "const": "FUSION_EMITTED"
+          }
+        },
+        "required": [
+          "phase"
+        ]
+      },
+      "then": {
+        "properties": {
+          "fusion": {
+            "properties": {
+              "state": {
+                "const": "FUSION_EMITTED"
+              },
+              "candidate_binding": {
+                "$ref": "#/$defs/file_binding"
+              },
+              "canonical_binding": {
+                "$ref": "#/$defs/file_binding"
+              },
+              "countersign_binding": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[A-F0-9]{64}$"
+    },
+    "identifier": {
+      "type": "string",
+      "pattern": "^[A-Z0-9][A-Z0-9._-]{0,127}$"
+    },
+    "absolute_path": {
+      "type": "string",
+      "minLength": 3,
+      "anyOf": [
+        {
+          "pattern": "^[A-Za-z]:[\\\\/].+"
+        },
+        {
+          "pattern": "^(?:\\\\\\\\|//)[^\\\\/]+[\\\\/][^\\\\/]+(?:[\\\\/].*)?$"
+        },
+        {
+          "pattern": "^/.*"
+        }
+      ]
+    },
+    "file_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "bytes",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/absolute_path"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "nullable_file_binding": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/file_binding"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "participant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "role",
+        "identity",
+        "host",
+        "session_id",
+        "mandate_path",
+        "mandate_bytes",
+        "mandate_sha256",
+        "write_lane",
+        "owned_paths"
+      ],
+      "properties": {
+        "role": {
+          "enum": [
+            "BUILDER",
+            "VERIFIER"
+          ]
+        },
+        "identity": {
+          "type": "string",
+          "minLength": 1
+        },
+        "host": {
+          "type": "string",
+          "minLength": 1
+        },
+        "session_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mandate_path": {
+          "$ref": "#/$defs/absolute_path"
+        },
+        "mandate_bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "mandate_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "write_lane": {
+          "$ref": "#/$defs/absolute_path"
+        },
+        "owned_paths": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/absolute_path"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      }
+    },
+    "session_pair": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pair_id",
+        "pair_sha256",
+        "lock_status",
+        "builder",
+        "verifier"
+      ],
+      "properties": {
+        "pair_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pair_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "lock_status": {
+          "const": "LOCKED_UNTIL_CUTOVER"
+        },
+        "builder": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/participant"
+            },
+            {
+              "properties": {
+                "role": {
+                  "const": "BUILDER"
+                }
+              }
+            }
+          ]
+        },
+        "verifier": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/participant"
+            },
+            {
+              "properties": {
+                "role": {
+                  "const": "VERIFIER"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "material_state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "manifest_binding"
+      ],
+      "properties": {
+        "state": {
+          "enum": [
+            "NOT_STARTED",
+            "MATERIAL_QUARANTINE",
+            "MATERIAL_JOINED"
+          ]
+        },
+        "manifest_binding": {
+          "$ref": "#/$defs/nullable_file_binding"
+        }
+      }
+    },
+    "lane_artifacts": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "light_map": {
+          "$ref": "#/$defs/file_binding"
+        },
+        "deep_plan": {
+          "$ref": "#/$defs/file_binding"
+        },
+        "deep_research_receipt": {
+          "$ref": "#/$defs/file_binding"
+        },
+        "deep_dossier": {
+          "$ref": "#/$defs/file_binding"
+        },
+        "source_manifest": {
+          "$ref": "#/$defs/file_binding"
+        },
+        "acquisitions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/file_binding"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "lane_state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "role",
+        "session_id",
+        "lane_root",
+        "state",
+        "artifacts",
+        "manifest_binding"
+      ],
+      "properties": {
+        "role": {
+          "enum": [
+            "BUILDER",
+            "VERIFIER"
+          ]
+        },
+        "session_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "lane_root": {
+          "$ref": "#/$defs/absolute_path"
+        },
+        "state": {
+          "enum": [
+            "MATERIAL_BOUND",
+            "LIGHT_MAP_FROZEN",
+            "DEEP_PLAN_FROZEN",
+            "DEEP_RESEARCH_ACTIVE",
+            "LANE_DOSSIER_READY",
+            "LANE_FROZEN"
+          ]
+        },
+        "artifacts": {
+          "$ref": "#/$defs/lane_artifacts"
+        },
+        "manifest_binding": {
+          "$ref": "#/$defs/nullable_file_binding"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "enum": [
+                  "LIGHT_MAP_FROZEN",
+                  "DEEP_PLAN_FROZEN",
+                  "DEEP_RESEARCH_ACTIVE",
+                  "LANE_DOSSIER_READY",
+                  "LANE_FROZEN"
+                ]
+              }
+            },
+            "required": [
+              "state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "artifacts": {
+                "required": [
+                  "light_map"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "enum": [
+                  "DEEP_PLAN_FROZEN",
+                  "DEEP_RESEARCH_ACTIVE",
+                  "LANE_DOSSIER_READY",
+                  "LANE_FROZEN"
+                ]
+              }
+            },
+            "required": [
+              "state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "artifacts": {
+                "required": [
+                  "deep_plan"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "enum": [
+                  "DEEP_RESEARCH_ACTIVE",
+                  "LANE_DOSSIER_READY",
+                  "LANE_FROZEN"
+                ]
+              }
+            },
+            "required": [
+              "state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "artifacts": {
+                "required": [
+                  "deep_research_receipt"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "enum": [
+                  "LANE_DOSSIER_READY",
+                  "LANE_FROZEN"
+                ]
+              }
+            },
+            "required": [
+              "state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "artifacts": {
+                "required": [
+                  "deep_dossier",
+                  "source_manifest",
+                  "acquisitions"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "LANE_FROZEN"
+              }
+            },
+            "required": [
+              "state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "manifest_binding": {
+                "$ref": "#/$defs/file_binding"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "manifest_binding": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "fusion_state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "candidate_binding",
+        "canonical_binding",
+        "countersign_binding"
+      ],
+      "properties": {
+        "state": {
+          "enum": [
+            "NOT_STARTED",
+            "FUSION_EMITTED",
+            "KNOWLEDGE_FUSION_PASS"
+          ]
+        },
+        "candidate_binding": {
+          "$ref": "#/$defs/nullable_file_binding"
+        },
+        "canonical_binding": {
+          "$ref": "#/$defs/nullable_file_binding"
+        },
+        "countersign_binding": {
+          "$ref": "#/$defs/nullable_file_binding"
+        }
+      }
+    }
+  }
+}

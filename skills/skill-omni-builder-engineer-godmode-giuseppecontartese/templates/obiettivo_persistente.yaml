@@ -1,0 +1,38 @@
+schema: omni-persistent-objective-v1
+objective: REPLACE_ME
+completion_condition: REPLACE_ME_WITH_MACHINE_OBSERVABLE_CONDITION
+completion_evidence: []
+authority_source: REPLACE_ME
+scope: [F3_BUILD, F4_TEST]
+writer: REPLACE_ME
+verifier: REPLACE_ME
+knowledge_gate:
+  required_status: KNOWLEDGE_FUSION_PASS
+  receipt_binding: null
+  plan_before_pass_forbidden: true
+operating_regime: REPLACE_ME_GUIDED_PM_OR_AUTONOMOUS
+operating_regime_binding: null
+autonomy_authority_binding: null
+arm_automation_authority_binding: null
+official_channel_binding: null
+budgets:
+  turns: 20
+  retries: 2
+  spawns: 1
+  wakeups: 30
+sentinels:
+  agentic: REQUIRED
+  script: REQUIRED
+  context: REQUIRED_WITH_KNOWN_DENOMINATOR
+  activation_rule: EXPLICIT_ARM_AUTOMATION_REQUIRED
+automation:
+  armed: false
+  required_when: AUTONOMOUS
+  forbidden_when: GUIDED_PM_WITHOUT_SEPARATE_AUTHORITY
+  named_components: []
+  stop_conditions: []
+  kill_switch_binding: null
+blocked_pending_human:
+  exact_question: null
+  resume_condition: null
+kill_switch: REPLACE_ME

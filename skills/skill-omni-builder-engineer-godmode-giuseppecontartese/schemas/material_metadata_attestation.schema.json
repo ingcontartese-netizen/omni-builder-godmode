@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:omni-builder:material-metadata-attestation:1",
+  "title": "Omni-Builder physical material metadata attestation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "status",
+    "attestation_id",
+    "pipeline_id",
+    "task_id",
+    "session_pair_sha256",
+    "subject_source_binding",
+    "issuer_role",
+    "issuer_session_id",
+    "rights_status",
+    "rights_evidence_binding",
+    "privacy_status",
+    "privacy_evidence_binding",
+    "acl_status",
+    "acl_evidence_binding",
+    "scan_status",
+    "scan_receipt_binding",
+    "parse_status",
+    "parse_receipt_binding",
+    "admission_recommendation",
+    "rejection_reason_codes",
+    "created_at",
+    "record_digest"
+  ],
+  "properties": {
+    "schema": {"const": "omni-material-metadata-attestation-v1"},
+    "status": {"const": "MATERIAL_METADATA_ATTESTED"},
+    "attestation_id": {"$ref": "#/$defs/identifier"},
+    "pipeline_id": {"$ref": "#/$defs/identifier"},
+    "task_id": {"$ref": "#/$defs/identifier"},
+    "session_pair_sha256": {"$ref": "#/$defs/sha256"},
+    "subject_source_binding": {"$ref": "#/$defs/file_binding"},
+    "issuer_role": {"const": "BUILDER"},
+    "issuer_session_id": {"type": "string", "minLength": 1},
+    "rights_status": {"enum": ["AUTHORIZED", "OWNED", "LICENSED", "PUBLIC", "DENIED", "UNKNOWN"]},
+    "rights_evidence_binding": {"$ref": "#/$defs/file_binding"},
+    "privacy_status": {"enum": ["APPROVED", "LOCAL_ONLY", "DENIED", "UNKNOWN"]},
+    "privacy_evidence_binding": {"$ref": "#/$defs/file_binding"},
+    "acl_status": {"enum": ["WITHIN_ENVELOPE", "OUTSIDE_ENVELOPE", "UNKNOWN"]},
+    "acl_evidence_binding": {"$ref": "#/$defs/file_binding"},
+    "scan_status": {"enum": ["PASS", "FAIL", "NOT_RUN"]},
+    "scan_receipt_binding": {"$ref": "#/$defs/file_binding"},
+    "parse_status": {"enum": ["PASS", "FAIL", "NOT_APPLICABLE", "NOT_RUN"]},
+    "parse_receipt_binding": {"$ref": "#/$defs/file_binding"},
+    "admission_recommendation": {"enum": ["ELIGIBLE", "REJECTED"]},
+    "rejection_reason_codes": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "MATERIAL_RIGHTS_DENIED",
+          "MATERIAL_PRIVACY_DENIED",
+          "MATERIAL_ACL_VIOLATION",
+          "MATERIAL_SCAN_FAILED",
+          "MATERIAL_PARSE_FAILED"
+        ]
+      },
+      "uniqueItems": true
+    },
+    "created_at": {"type": "string", "format": "date-time"},
+    "record_digest": {"$ref": "#/$defs/sha256"}
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "rights_status": {"enum": ["AUTHORIZED", "OWNED", "LICENSED", "PUBLIC"]},
+          "privacy_status": {"enum": ["APPROVED", "LOCAL_ONLY"]},
+          "acl_status": {"const": "WITHIN_ENVELOPE"},
+          "scan_status": {"const": "PASS"},
+          "parse_status": {"enum": ["PASS", "NOT_APPLICABLE"]}
+        },
+        "required": ["rights_status", "privacy_status", "acl_status", "scan_status", "parse_status"]
+      },
+      "then": {
+        "properties": {
+          "admission_recommendation": {"const": "ELIGIBLE"},
+          "rejection_reason_codes": {"maxItems": 0}
+        }
+      },
+      "else": {
+        "properties": {
+          "admission_recommendation": {"const": "REJECTED"},
+          "rejection_reason_codes": {"minItems": 1}
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "identifier": {"type": "string", "pattern": "^[A-Z0-9][A-Z0-9._-]{0,127}$"},
+    "absolute_path": {
+      "type": "string",
+      "minLength": 3,
+      "anyOf": [
+        {"pattern": "^[A-Za-z]:[\\\\/].+"},
+        {"pattern": "^(?:\\\\\\\\|//)[^\\\\/]+[\\\\/][^\\\\/]+(?:[\\\\/].*)?$"},
+        {"pattern": "^/.*"}
+      ]
+    },
+    "file_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "bytes", "sha256"],
+      "properties": {
+        "path": {"$ref": "#/$defs/absolute_path"},
+        "bytes": {"type": "integer", "minimum": 1},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      }
+    }
+  }
+}

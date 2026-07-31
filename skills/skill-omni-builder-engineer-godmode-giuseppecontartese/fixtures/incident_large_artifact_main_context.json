@@ -1,0 +1,7 @@
+{
+  "schema": "omni-incident-fixture-v1",
+  "id": "PB-019-LARGE-ARTIFACT-MAIN-CONTEXT",
+  "control": "context_budget",
+  "input": {"artifact_bytes": 1226266, "full_payload_requested_in_main_context": true},
+  "expected": {"must_fail": true, "remedy": "ISOLATED_MECHANICAL_PROBE_PLUS_DIGEST"}
+}

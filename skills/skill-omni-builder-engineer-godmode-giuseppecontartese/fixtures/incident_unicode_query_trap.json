@@ -1,0 +1,12 @@
+{
+  "schema": "omni-incident-fixture-v1",
+  "id": "PB-024-UNICODE-QUERY-TRAP",
+  "control": "byte_search",
+  "input": {
+    "text": "non‑blocking",
+    "query": "non-blocking",
+    "codepoints_differ": true,
+    "workaround": {"pattern": "non(?:-|‑)blocking", "examples": ["non-blocking", "non‑blocking"], "expected_matches": 2}
+  },
+  "expected": {"zero_match_is_not_absence": true, "first_check": "QUERY_ENCODING", "workaround_must_be_tested": true}
+}

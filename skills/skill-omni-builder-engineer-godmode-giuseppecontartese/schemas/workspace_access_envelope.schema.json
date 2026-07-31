@@ -1,0 +1,154 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:omni-builder:workspace-access-envelope:1",
+  "title": "Omni-Builder bounded non-destructive workspace access envelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "status",
+    "outcome",
+    "envelope_id",
+    "activation_receipt_sha256",
+    "task_id",
+    "task_root",
+    "project_root",
+    "source_roots",
+    "owned_lane_root",
+    "session_pair_sha256",
+    "run_kind",
+    "requested_capabilities",
+    "granted_capabilities",
+    "non_grants",
+    "separate_authorizations_required",
+    "excluded_paths",
+    "probe_receipt_binding",
+    "record_digest"
+  ],
+  "properties": {
+    "schema": {"const": "omni-workspace-access-envelope-v1"},
+    "status": {"enum": ["ACCESS_READY", "AUTONOMY_UNAVAILABLE_NO_ACCESS"]},
+    "outcome": {"enum": ["ACCESS_GRANTED_NON_DESTRUCTIVE", "ACCESS_PARTIAL", "ACCESS_DENIED", "ACCESS_PLANNED_DRY_RUN"]},
+    "envelope_id": {"$ref": "#/$defs/identifier"},
+    "activation_receipt_sha256": {"$ref": "#/$defs/sha256"},
+    "task_id": {"$ref": "#/$defs/identifier"},
+    "task_root": {"$ref": "#/$defs/absolute_path"},
+    "project_root": {"$ref": "#/$defs/absolute_path"},
+    "source_roots": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/absolute_path"}, "uniqueItems": true},
+    "owned_lane_root": {"$ref": "#/$defs/absolute_path"},
+    "session_pair_sha256": {"$ref": "#/$defs/sha256"},
+    "run_kind": {"enum": ["REAL", "DRY_RUN"]},
+    "requested_capabilities": {"const": ["READ_NAMED_SOURCES", "CREATE_DIRECTORIES_IN_PROJECT_ROOT", "CREATE_FILES_IN_PROJECT_ROOT", "WRITE_OWNED_LANE_FILES"]},
+    "granted_capabilities": {
+      "type": "array",
+      "items": {"enum": ["READ_NAMED_SOURCES", "CREATE_DIRECTORIES_IN_PROJECT_ROOT", "CREATE_FILES_IN_PROJECT_ROOT", "WRITE_OWNED_LANE_FILES"]},
+      "uniqueItems": true
+    },
+    "non_grants": {"const": ["DELETE", "MOVE", "RENAME_OUTSIDE_ROOT", "OVERWRITE_PREEXISTING_USER_FILE", "EXECUTE", "INSTALL", "PUBLISH", "EXTERNAL_EFFECTS"]},
+    "separate_authorizations_required": {"const": ["NETWORK_RESEARCH", "DOWNLOAD"]},
+    "excluded_paths": {"type": "array", "items": {"$ref": "#/$defs/absolute_path"}, "uniqueItems": true},
+    "probe_receipt_binding": {
+      "oneOf": [
+        {"$ref": "#/$defs/file_binding"},
+        {"type": "null"}
+      ]
+    },
+    "record_digest": {"$ref": "#/$defs/sha256"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"status": {"const": "ACCESS_READY"}}, "required": ["status"]},
+      "then": {
+        "properties": {
+          "outcome": {"const": "ACCESS_GRANTED_NON_DESTRUCTIVE"},
+          "run_kind": {"const": "REAL"},
+          "granted_capabilities": {"const": ["READ_NAMED_SOURCES", "CREATE_DIRECTORIES_IN_PROJECT_ROOT", "CREATE_FILES_IN_PROJECT_ROOT", "WRITE_OWNED_LANE_FILES"]},
+          "probe_receipt_binding": {"$ref": "#/$defs/file_binding"}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"run_kind": {"const": "DRY_RUN"}}, "required": ["run_kind"]},
+      "then": {
+        "properties": {
+          "status": {"const": "AUTONOMY_UNAVAILABLE_NO_ACCESS"},
+          "outcome": {"const": "ACCESS_PLANNED_DRY_RUN"},
+          "granted_capabilities": {"maxItems": 0},
+          "probe_receipt_binding": {"type": "null"}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"outcome": {"const": "ACCESS_GRANTED_NON_DESTRUCTIVE"}}, "required": ["outcome"]},
+      "then": {
+        "properties": {
+          "status": {"const": "ACCESS_READY"},
+          "run_kind": {"const": "REAL"},
+          "granted_capabilities": {"const": ["READ_NAMED_SOURCES", "CREATE_DIRECTORIES_IN_PROJECT_ROOT", "CREATE_FILES_IN_PROJECT_ROOT", "WRITE_OWNED_LANE_FILES"]},
+          "probe_receipt_binding": {"$ref": "#/$defs/file_binding"}
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {"const": "AUTONOMY_UNAVAILABLE_NO_ACCESS"},
+          "run_kind": {"const": "REAL"}
+        },
+        "required": ["status", "run_kind"]
+      },
+      "then": {
+        "properties": {
+          "outcome": {"enum": ["ACCESS_PARTIAL", "ACCESS_DENIED"]},
+          "probe_receipt_binding": {"type": "null"}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"outcome": {"const": "ACCESS_PARTIAL"}}, "required": ["outcome"]},
+      "then": {
+        "properties": {
+          "status": {"const": "AUTONOMY_UNAVAILABLE_NO_ACCESS"},
+          "run_kind": {"const": "REAL"},
+          "granted_capabilities": {"minItems": 1, "maxItems": 3},
+          "probe_receipt_binding": {"type": "null"}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"outcome": {"const": "ACCESS_DENIED"}}, "required": ["outcome"]},
+      "then": {
+        "properties": {
+          "status": {"const": "AUTONOMY_UNAVAILABLE_NO_ACCESS"},
+          "run_kind": {"const": "REAL"},
+          "granted_capabilities": {"maxItems": 0},
+          "probe_receipt_binding": {"type": "null"}
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "identifier": {"type": "string", "pattern": "^[A-Z0-9][A-Z0-9._-]{0,127}$"},
+    "absolute_path": {
+      "type": "string",
+      "minLength": 3,
+      "description": "Native absolute path. Runtime additionally rejects relative/drive-relative, ADS, device namespace, reserved-device and trailing-dot/space aliases.",
+      "anyOf": [
+        {"pattern": "^[A-Za-z]:[\\\\/].+"},
+        {"pattern": "^(?:\\\\\\\\|//)[^\\\\/]+[\\\\/][^\\\\/]+(?:[\\\\/].*)?$"},
+        {"pattern": "^/.*"}
+      ]
+    },
+    "file_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "bytes", "sha256"],
+      "properties": {
+        "path": {"$ref": "#/$defs/absolute_path"},
+        "bytes": {"type": "integer", "minimum": 1},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      }
+    }
+  }
+}

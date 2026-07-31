@@ -1,0 +1,656 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:omni-builder:relay-ledger-entry:1",
+  "title": "Canonical per-stream relay ledger entry",
+  "description": "One locally hash-chained NDJSON entry. External create-once anchor and caller-qualification contracts are exposed under $defs; an entry never claims a cross-stream total order or a qualified trust domain.",
+  "$comment": "Validate volume seals against #/$defs/volume_seal, external anchor artifacts against #/$defs/external_anchor_record, and caller attestations against #/$defs/external_anchor_qualification.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "run_id",
+    "stream_id",
+    "volume_id",
+    "volume_no",
+    "stream_seq",
+    "event_id",
+    "writer_id",
+    "writer_instance_id",
+    "lease_id",
+    "fence",
+    "topology",
+    "hat",
+    "independent_verifier",
+    "created_at",
+    "kind",
+    "title",
+    "body",
+    "body_bytes",
+    "canonicalization_version",
+    "observed_heads",
+    "supersedes",
+    "request_hash",
+    "prev_entry_hash",
+    "prev_volume_seal_hash",
+    "integrity_scope",
+    "entry_hash"
+  ],
+  "properties": {
+    "schema": {
+      "const": "omni-relay-ledger-entry-v1"
+    },
+    "run_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "stream_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "volume_id": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 400
+    },
+    "volume_no": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "stream_seq": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "event_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "writer_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "writer_instance_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "lease_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "fence": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "topology": {
+      "enum": [
+        "TEAM",
+        "SOLO_HATS"
+      ]
+    },
+    "hat": {
+      "enum": [
+        "BUILDER",
+        "VERIFIER",
+        "OTHER"
+      ]
+    },
+    "independent_verifier": {
+      "type": "boolean"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "Z$"
+    },
+    "kind": {
+      "enum": [
+        "MESSAGE",
+        "CORRECTION",
+        "CONTROL"
+      ]
+    },
+    "title": {
+      "type": "string",
+      "maxLength": 4096
+    },
+    "body": {
+      "type": "string",
+      "maxLength": 10485760
+    },
+    "body_bytes": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Exact UTF-8 byte length of the normalized body; semantic validation recomputes it."
+    },
+    "canonicalization_version": {
+      "const": "OMNI_CANONICAL_JSON_V1"
+    },
+    "observed_heads": {
+      "type": "array",
+      "uniqueItems": true,
+      "description": "Causal observations only. Runtime validation requires unique stream_id values sorted lexicographically by stream_id; this is not a total order.",
+      "items": {
+        "$ref": "#/$defs/causal_head"
+      }
+    },
+    "supersedes": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/sha256"
+      }
+    },
+    "request_hash": {
+      "$ref": "#/$defs/sha256"
+    },
+    "prev_entry_hash": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/sha256"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "prev_volume_seal_hash": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/sha256"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "integrity_scope": {
+      "const": "LOCAL_HASH_CHAIN_UNANCHORED"
+    },
+    "entry_hash": {
+      "$ref": "#/$defs/sha256"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "topology": {
+            "const": "SOLO_HATS"
+          }
+        },
+        "required": [
+          "topology"
+        ]
+      },
+      "then": {
+        "properties": {
+          "independent_verifier": {
+            "const": false
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[A-F0-9]{64}$"
+    },
+    "causal_head": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stream_id",
+        "stream_seq",
+        "entry_hash"
+      ],
+      "properties": {
+        "stream_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "stream_seq": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "entry_hash": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "rotation_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "max_entries_per_volume",
+        "max_bytes_per_volume"
+      ],
+      "properties": {
+        "schema": {
+          "const": "omni-relay-ledger-rotation-policy-v1"
+        },
+        "max_entries_per_volume": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "max_bytes_per_volume": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "volume_seal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "run_id",
+        "stream_id",
+        "volume_id",
+        "volume_no",
+        "first_seq",
+        "last_seq",
+        "entry_count",
+        "byte_length",
+        "file_sha256",
+        "final_entry_hash",
+        "previous_volume_seal_hash",
+        "rotation_policy",
+        "rotation_reasons",
+        "phase_gate_id",
+        "sealed_at",
+        "integrity_scope",
+        "seal_hash"
+      ],
+      "properties": {
+        "schema": {
+          "const": "omni-relay-ledger-volume-seal-v1"
+        },
+        "run_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "stream_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "volume_id": {
+          "type": "string",
+          "minLength": 5,
+          "maxLength": 400
+        },
+        "volume_no": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "first_seq": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "last_seq": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "entry_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "byte_length": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "file_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "final_entry_hash": {
+          "$ref": "#/$defs/sha256"
+        },
+        "previous_volume_seal_hash": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/sha256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "rotation_policy": {
+          "$ref": "#/$defs/rotation_policy"
+        },
+        "rotation_reasons": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "ENTRY_THRESHOLD",
+              "BYTE_THRESHOLD",
+              "PHASE_GATE",
+              "MANUAL_REQUEST"
+            ]
+          }
+        },
+        "phase_gate_id": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/identifier"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sealed_at": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "Z$"
+        },
+        "integrity_scope": {
+          "const": "LOCAL_HASH_CHAIN_UNANCHORED"
+        },
+        "seal_hash": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "anchor_head": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stream_id",
+        "ledger_root_fingerprint",
+        "volume_id",
+        "volume_no",
+        "stream_seq",
+        "entry_hash",
+        "byte_offset",
+        "anchored_prefix_sha256",
+        "volume_seal_hash"
+      ],
+      "properties": {
+        "stream_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "ledger_root_fingerprint": {
+          "$ref": "#/$defs/sha256"
+        },
+        "volume_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "volume_no": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "stream_seq": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "entry_hash": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/sha256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "byte_offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "anchored_prefix_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "volume_seal_hash": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/sha256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "external_anchor_trust_domain": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "trust_domain_id",
+            "qualification_id",
+            "basis",
+            "evidence_sha256",
+            "qualification_hash"
+          ],
+          "properties": {
+            "status": {
+              "const": "UNQUALIFIED"
+            },
+            "trust_domain_id": {
+              "type": "null"
+            },
+            "qualification_id": {
+              "type": "null"
+            },
+            "basis": {
+              "type": "null"
+            },
+            "evidence_sha256": {
+              "type": "null"
+            },
+            "qualification_hash": {
+              "type": "null"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "trust_domain_id",
+            "qualification_id",
+            "basis",
+            "evidence_sha256",
+            "qualification_hash"
+          ],
+          "properties": {
+            "status": {
+              "const": "CALLER_QUALIFIED_UNVERIFIED"
+            },
+            "trust_domain_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "qualification_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "basis": {
+              "enum": [
+                "SEPARATE_PRINCIPAL_APPEND_ONLY",
+                "WORM",
+                "TRANSPARENCY_LOG",
+                "PROTECTED_REMOTE"
+              ]
+            },
+            "evidence_sha256": {
+              "$ref": "#/$defs/sha256"
+            },
+            "qualification_hash": {
+              "$ref": "#/$defs/sha256"
+            }
+          }
+        }
+      ]
+    },
+    "external_anchor_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "anchor_set_id",
+        "run_id",
+        "anchor_seq",
+        "created_at",
+        "previous_anchor_hash",
+        "anchor_root_fingerprint",
+        "qualification_subject_hash",
+        "heads",
+        "heads_hash",
+        "trust_domain",
+        "anchor_scope",
+        "anchor_hash"
+      ],
+      "properties": {
+        "schema": {
+          "const": "omni-relay-ledger-external-anchor-v1"
+        },
+        "anchor_set_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "run_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "anchor_seq": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "Z$"
+        },
+        "previous_anchor_hash": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/sha256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "anchor_root_fingerprint": {
+          "$ref": "#/$defs/sha256"
+        },
+        "qualification_subject_hash": {
+          "$ref": "#/$defs/sha256"
+        },
+        "heads": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/anchor_head"
+          }
+        },
+        "heads_hash": {
+          "$ref": "#/$defs/sha256"
+        },
+        "trust_domain": {
+          "$ref": "#/$defs/external_anchor_trust_domain"
+        },
+        "anchor_scope": {
+          "const": "EXTERNAL_CREATE_ONCE_VECTOR_HEAD_ANCHOR"
+        },
+        "anchor_hash": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "ledger_root_fingerprint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stream_id",
+        "root_fingerprint"
+      ],
+      "properties": {
+        "stream_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "root_fingerprint": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "external_anchor_qualification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "status",
+        "anchor_set_id",
+        "run_id",
+        "anchor_root_fingerprint",
+        "ledger_roots",
+        "trust_domain_id",
+        "qualification_id",
+        "qualified_by",
+        "basis",
+        "evidence_sha256",
+        "qualified_at",
+        "expires_at"
+      ],
+      "properties": {
+        "schema": {
+          "const": "omni-relay-ledger-external-anchor-qualification-v1"
+        },
+        "status": {
+          "const": "CALLER_QUALIFIED_UNVERIFIED"
+        },
+        "anchor_set_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "run_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "anchor_root_fingerprint": {
+          "$ref": "#/$defs/sha256"
+        },
+        "ledger_roots": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/ledger_root_fingerprint"
+          }
+        },
+        "trust_domain_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "qualification_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "qualified_by": {
+          "$ref": "#/$defs/identifier"
+        },
+        "basis": {
+          "enum": [
+            "SEPARATE_PRINCIPAL_APPEND_ONLY",
+            "WORM",
+            "TRANSPARENCY_LOG",
+            "PROTECTED_REMOTE"
+          ]
+        },
+        "evidence_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "qualified_at": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "Z$"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "Z$"
+        }
+      }
+    }
+  }
+}

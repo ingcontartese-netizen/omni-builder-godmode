@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:omni-builder:receipt:1",
+  "title": "Byte-bound governed receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "receipt_id", "kind", "status", "producer", "inputs", "checks",
+    "mismatches", "previous_record_sha256", "created_at", "record_digest"
+  ],
+  "properties": {
+    "schema": {"const": "omni-receipt-v1"},
+    "receipt_id": {"type": "string", "minLength": 1},
+    "kind": {"type": "string", "minLength": 1},
+    "status": {"enum": ["PASS", "FAIL", "INCONCLUSIVE", "BLOCKED"]},
+    "producer": {"type": "string", "minLength": 1},
+    "inputs": {"type": "array", "items": {"$ref": "#/$defs/file"}},
+    "checks": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "mismatches": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "previous_record_sha256": {"anyOf": [{"$ref": "#/$defs/sha256"}, {"type": "null"}]},
+    "created_at": {"type": "string", "format": "date-time"},
+    "record_digest": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "file": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "bytes", "sha256"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "bytes": {"type": "integer", "minimum": 0},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      }
+    }
+  }
+}
