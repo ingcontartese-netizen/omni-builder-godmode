@@ -28,7 +28,17 @@ jobs:
         run: python -B scripts/validate_skill.py . --no-tests
 
       - name: Full test suite (226 tests)
-        run: python -B -m unittest discover -s tests -p "test_*.py"
+        shell: pwsh
+        run: |
+          # GitHub's default Windows TEMP can contain an 8.3 path alias
+          # (for example RUNNER~1). The path-safety layer resolves physical
+          # names, so keep test fixtures under one canonical workspace root.
+          $ciTemp = Join-Path $env:GITHUB_WORKSPACE ".ci-tmp"
+          New-Item -ItemType Directory -Force -Path $ciTemp | Out-Null
+          $env:TEMP = $ciTemp
+          $env:TMP = $ciTemp
+          $env:TMPDIR = $ciTemp
+          python -B -m unittest discover -s tests -p "test_*.py"
         env:
           PYTHONDONTWRITEBYTECODE: "1"
 
